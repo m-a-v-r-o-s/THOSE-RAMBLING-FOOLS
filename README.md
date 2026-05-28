@@ -1,6 +1,5 @@
 # Those Rambling Fools — Band Site
 
-A Next.js 15 site (App Router + TypeScript) with an interactive turntable that plays the band's albums via Spotify embeds. The site's color palette, background, and atmosphere shift to match whichever album is currently spinning.
 
 ## Running locally
 
