@@ -6,8 +6,9 @@ export default function Home() {
       <header className="masthead">
         <img
           className="logo"
-          src="/covers/trflogotext.png"
+          src="/covers/trflogotext.webp"
           alt="Those Rambling Fools"
+          fetchPriority="high"
         />
       </header>
 
@@ -15,7 +16,7 @@ export default function Home() {
 
       <footer>
         <p className="inquiries">
-          For gigs or other business inquiries{''}
+          For gigs and business inquiries{' '}
           <a
             className="inquiries-link"
             href="https://www.instagram.com/thoseramblingfoolsofficial/"

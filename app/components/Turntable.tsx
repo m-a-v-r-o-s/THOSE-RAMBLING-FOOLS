@@ -33,17 +33,19 @@ export default function Turntable() {
   );
 
   const startStopImg = !currentAlbum
-    ? '/covers/button.png'
+    ? '/covers/button.webp'
     : isPaused
-    ? '/covers/buttonstart.png'
-    : '/covers/buttonstop.png';
+    ? '/covers/buttonstart.webp'
+    : '/covers/buttonstop.webp';
 
   return (
     <>
       <div className="player-scene">
 
         <Link href="/our-story" className="side-link side-link-left">
-          Our Story
+          <img src="/covers/ourstory.webp" className="side-link-img" alt="Our Story" />
+          <img src="/covers/buttonhor2.webp" className="side-link-img-mobile" alt="Our Story" />
+          <span className="side-link-text">Our Story</span>
         </Link>
 
         {/* Left sidebar — albums I & II */}
@@ -100,7 +102,7 @@ export default function Turntable() {
             </div>
 
             <div className={`tonearm${isTonearmDown ? ' playing' : ''}`}>
-              <img src="/covers/arm.png" alt="" />
+              <img src="/covers/arm.webp" alt="" />
             </div>
 
             <button
@@ -143,7 +145,9 @@ export default function Turntable() {
         </div>
 
         <Link href="/upcoming-gigs" className="side-link side-link-right">
-          Upcoming Gigs
+          <img src="/covers/gigs.webp" className="side-link-img" alt="Upcoming Gigs" />
+          <img src="/covers/buttonhor.webp" className="side-link-img-mobile" alt="Upcoming Gigs" />
+          <span className="side-link-text">Upcoming Gigs</span>
         </Link>
 
       </div>

@@ -26,6 +26,21 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Abel&display=swap"
           rel="stylesheet"
         />
+        {/* Preload critical above-the-fold images */}
+        <link rel="preload" as="image" href="/covers/trflogotext.webp" />
+        <link rel="preload" as="image" href="/covers/playeronlynew.webp" />
+        <link
+          rel="preload"
+          as="image"
+          href="/covers/repmobile.webp"
+          media="(max-width: 859px)"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/covers/rep.png"
+          media="(min-width: 860px)"
+        />
       </head>
       <body data-theme="default">
         <AudioProvider>{children}</AudioProvider>
