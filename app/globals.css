@@ -692,23 +692,17 @@ footer {
   margin-bottom: 16px;
 }
 .inquiries-link {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 8px;
-  padding: 6px 14px;
+  display: inline;
+  margin-left: 4px;
   color: #cfd2d6;
-  text-decoration: none;
-  border: 1px solid rgba(207, 210, 214, 0.4);
-  border-radius: 4px;
+  text-decoration: underline;
+  border: none;
+  font-weight: bold;
   transition:
-    color 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+    color 0.25s ease;
 }
 .inquiries-link:hover {
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.18);
 }
 .social {
   display: flex;
