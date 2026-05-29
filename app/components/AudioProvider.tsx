@@ -19,6 +19,8 @@ type AudioCtx = {
   isRecordVisible: boolean;
   isNowPlayingVisible: boolean;
   recordLabelImg: string;
+  hintDismissed: boolean;
+  dismissHint: () => void;
   selectAlbum: (album: Album) => void;
   togglePlay: () => void;
   eject: () => void;
@@ -45,6 +47,9 @@ export default function AudioProvider({ children }: { children: ReactNode }) {
   const [isTonearmDown, setIsTonearmDown] = useState(false);
   const [isNowPlayingVisible, setIsNowPlayingVisible] = useState(false);
   const [recordLabelImg, setRecordLabelImg] = useState('');
+  const [hintDismissed, setHintDismissed] = useState(false);
+
+  const dismissHint = useCallback(() => setHintDismissed(true), []);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -150,6 +155,8 @@ export default function AudioProvider({ children }: { children: ReactNode }) {
         isRecordVisible,
         isNowPlayingVisible,
         recordLabelImg,
+        hintDismissed,
+        dismissHint,
         selectAlbum,
         togglePlay,
         eject,

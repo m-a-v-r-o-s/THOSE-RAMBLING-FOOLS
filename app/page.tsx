@@ -72,10 +72,25 @@ export default function Home() {
             </svg>
           </a>
         </nav>
-        <p className="copyright">
-          © Dromiko Productions 2026. All rights reserved
-          <br />© Akos Digital 2026. All rights reserved
-        </p>
+        <div className="copyright">
+          <span className="copyright-center">
+            Additional design elements by{' '}
+            <a
+              className="inquiries-link"
+              href="https://adconcept.gr/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Concept Creative
+            </a>
+          </span>
+          <span className="copyright-left">
+            © Dromiko Productions 2026. All rights reserved
+          </span>
+          <span className="copyright-right">
+            © Akos Digital 2026. All rights reserved
+          </span>
+        </div>
       </footer>
     </div>
   );

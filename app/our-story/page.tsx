@@ -14,7 +14,7 @@ export default function OurStory() {
       </header>
 
       <main className="subpage-content">
-        <h1 className="subpage-title">Our Story</h1>
+        <h1 className="subpage-title">Ramblings</h1>
         <p>
           &ldquo;There&rsquo;s a break in the scene<br />
           But my kitchen is clean<br />

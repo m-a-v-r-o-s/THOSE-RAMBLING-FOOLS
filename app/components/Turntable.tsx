@@ -14,6 +14,8 @@ export default function Turntable() {
     isRecordVisible,
     isNowPlayingVisible,
     recordLabelImg,
+    hintDismissed,
+    dismissHint,
     selectAlbum,
     togglePlay,
     eject,
@@ -43,9 +45,9 @@ export default function Turntable() {
       <div className="player-scene">
 
         <Link href="/our-story" className="side-link side-link-left">
-          <img src="/covers/ourstory.webp" className="side-link-img" alt="Our Story" />
-          <img src="/covers/buttonhor2.webp" className="side-link-img-mobile" alt="Our Story" />
-          <span className="side-link-text">Our Story</span>
+          <img src="/covers/ramblings2.webp" className="side-link-img" alt="Ramblings" />
+          <img src="/covers/ramblings2mob.webp" className="side-link-img-mobile" alt="Ramblings" />
+          <span className="side-link-text">Ramblings</span>
         </Link>
 
         {/* Left sidebar — albums I & II */}
@@ -107,12 +109,38 @@ export default function Turntable() {
 
             <button
               className="start-stop-btn"
-              onClick={togglePlay}
+              onClick={() => {
+                dismissHint();
+                togglePlay();
+              }}
               disabled={!currentAlbum}
               style={{ backgroundImage: `url('${startStopImg}')` }}
               aria-label="Start or stop playback"
               title="Start / Stop"
             />
+          </div>
+
+          <div
+            className={`spin-hint${hintDismissed ? ' hidden' : ''}`}
+            aria-hidden="true"
+          >
+            <svg className="spin-hint-arrow" viewBox="0 0 64 64" fill="none">
+              <path
+                d="M56 8 C 52 30, 44 48, 12 55"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 55 L 27 59 M12 55 L 24 45"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="spin-hint-text">Press to spin</span>
           </div>
         </div>
 
@@ -169,7 +197,10 @@ export default function Turntable() {
           </button>
           <button
             className="mini-play"
-            onClick={togglePlay}
+            onClick={() => {
+              dismissHint();
+              togglePlay();
+            }}
             disabled={!currentAlbum}
             aria-label={isPaused ? 'Play' : 'Pause'}
           >

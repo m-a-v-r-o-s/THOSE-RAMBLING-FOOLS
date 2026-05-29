@@ -32,13 +32,13 @@ export default function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="/covers/repmobile.webp"
+          href="/covers/finalfinalmob.webp"
           media="(max-width: 859px)"
         />
         <link
           rel="preload"
           as="image"
-          href="/covers/rep.png"
+          href="/covers/finafinallbg.png"
           media="(min-width: 860px)"
         />
       </head>
