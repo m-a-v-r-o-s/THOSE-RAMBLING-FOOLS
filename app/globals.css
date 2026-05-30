@@ -992,7 +992,7 @@ footer {
     gap: clamp(24px, 5vw, 50px);
   }
   .vinyl-pick {
-    max-width: 210px;
+    max-width: 160px;
   }
   .vinyl-pick.album-2 {
     top: -16px;
@@ -1011,7 +1011,7 @@ footer {
     transform: translateX(-4%);
   }
   .vinyl-pick {
-    max-width: 168px;
+    max-width: 128px;
   }
   .vinyl-pick .album-name {
     font-size: 0.7rem;
