@@ -474,7 +474,7 @@ body::before {
   text-transform: uppercase;
   white-space: nowrap;
   margin-top: 2px;
-  transform: translateX(-20px);
+  transform: translateX(-44px);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
 }
 
@@ -900,6 +900,12 @@ footer {
   fill: currentColor;
   display: block;
 }
+.social-btn .social-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  display: block;
+}
 .social-btn:hover {
   color: #ffffff;
   filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
@@ -990,6 +996,11 @@ footer {
     flex-direction: row;
     justify-content: center;
     gap: clamp(24px, 5vw, 50px);
+  }
+  .inquiries {
+    white-space: nowrap;
+    font-size: clamp(0.6rem, 2.4vw, 0.7rem);
+    letter-spacing: 0.05em;
   }
   .vinyl-pick {
     max-width: 160px;
