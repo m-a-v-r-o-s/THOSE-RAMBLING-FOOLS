@@ -24,7 +24,7 @@
 html,
 body {
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   font-family: 'Abel', sans-serif;
   color: var(--ink);
   transition: color 1.2s ease;
@@ -950,9 +950,42 @@ footer {
 
 /* Below 860px: stack vertically, shelves become rows */
 @media (max-width: 860px) {
+  .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  /* Full-bleed black backdrop that fades in only once the logo is pinned */
+  .masthead::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(50% - 50vw);
+    width: 100vw;
+    height: calc(100% + 16px);
+    background:
+      url('/covers/finalfinalmob.webp') 15% center / cover no-repeat fixed,
+      radial-gradient(
+        ellipse at 50% 110%,
+        var(--bg-3) 0%,
+        var(--bg-2) 35%,
+        var(--bg-1) 80%
+      ) fixed;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .masthead.stuck::before {
+    opacity: 1;
+  }
   .masthead .logo {
     width: min(560px, 96vw);
     transform: translateX(-4%);
+    transition: transform 0.3s ease;
+  }
+  .masthead.stuck .logo {
+    transform: translateX(-4%) translateY(8px);
   }
   /* Move the sections above the player down a bit (home only) */
   .stage:not(.subpage) .masthead {

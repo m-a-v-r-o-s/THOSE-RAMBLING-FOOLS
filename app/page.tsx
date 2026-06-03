@@ -1,16 +1,10 @@
+import Masthead from './components/Masthead';
 import Turntable from './components/Turntable';
 
 export default function Home() {
   return (
     <div className="stage">
-      <header className="masthead">
-        <img
-          className="logo"
-          src="/covers/trflogotext.webp"
-          alt="Those Rambling Fools"
-          fetchPriority="high"
-        />
-      </header>
+      <Masthead />
 
       <Turntable />
 
