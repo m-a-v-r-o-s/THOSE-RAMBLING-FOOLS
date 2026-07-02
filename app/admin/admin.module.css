@@ -63,7 +63,8 @@
 }
 
 .field input,
-.field select {
+.field select,
+.field textarea {
   font-family: 'Abel', sans-serif;
   font-size: 1rem;
   color: #f0e6c0;
@@ -76,13 +77,21 @@
 }
 
 .field input:focus,
-.field select:focus {
+.field select:focus,
+.field textarea:focus {
   border-color: #e8c050;
 }
 
-.field input::placeholder {
+.field input::placeholder,
+.field textarea::placeholder {
   color: #f0e6c0;
   opacity: 0.35;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 180px;
+  line-height: 1.6;
 }
 
 .field select {
@@ -200,6 +209,13 @@
 .cancel:hover {
   color: #ffffff;
   text-decoration: underline;
+}
+
+.savedNote {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9fd8a0;
 }
 
 .error {

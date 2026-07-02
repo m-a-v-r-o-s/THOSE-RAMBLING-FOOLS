@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { SESSION_COOKIE, sessionToken } from '@/lib/admin-auth';
+import { SESSION_COOKIE, getAdminCredentials, sessionToken } from '@/lib/admin-auth';
 
 // Guards everything under /admin with a cookie session (set by /admin/login).
 // Set ADMIN_USER and ADMIN_PASSWORD in the environment (Railway variables).
@@ -14,18 +14,17 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const user = process.env.ADMIN_USER;
-  const pass = process.env.ADMIN_PASSWORD;
+  const creds = getAdminCredentials();
 
   // If credentials aren't configured, allow access in development so you're not
   // locked out locally, but refuse in production rather than exposing the panel.
-  if (!user || !pass) {
+  if (!creds) {
     if (process.env.NODE_ENV !== 'production') return NextResponse.next();
     return new NextResponse('Admin is not configured.', { status: 503 });
   }
 
   const cookie = req.cookies.get(SESSION_COOKIE)?.value;
-  const expected = await sessionToken(user, pass);
+  const expected = await sessionToken(creds.user, creds.pass);
   if (cookie && cookie === expected) {
     return NextResponse.next();
   }

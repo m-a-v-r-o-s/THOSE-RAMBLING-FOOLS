@@ -10,7 +10,10 @@ import {
   type Frequency,
   type Gig,
 } from '@/lib/gig-format';
+import type { StoryContent } from '@/lib/story';
 import styles from './admin.module.css';
+
+const EMPTY_STORY: StoryContent = { title: '', body: '', signature: '' };
 
 const EMPTY = {
   name: '',
@@ -32,6 +35,12 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const formCardRef = useRef<HTMLElement>(null);
 
+  const [story, setStory] = useState<StoryContent>(EMPTY_STORY);
+  const [storyLoading, setStoryLoading] = useState(true);
+  const [storySaving, setStorySaving] = useState(false);
+  const [storyError, setStoryError] = useState<string | null>(null);
+  const [storySaved, setStorySaved] = useState(false);
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -46,9 +55,24 @@ export default function AdminPage() {
     }
   }, []);
 
+  const loadStory = useCallback(async () => {
+    setStoryLoading(true);
+    try {
+      const res = await fetch('/admin/api/story', { cache: 'no-store' });
+      if (!res.ok) throw new Error();
+      setStory(await res.json());
+      setStoryError(null);
+    } catch {
+      setStoryError('Could not load the Our Story text.');
+    } finally {
+      setStoryLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     load();
-  }, [load]);
+    loadStory();
+  }, [load, loadStory]);
 
   const setField =
     (key: 'name' | 'location' | 'mapUrl' | 'time') =>
@@ -154,11 +178,44 @@ export default function AdminPage() {
   // Keep the focused field visible above the mobile keyboard.
   function handleFocus(e: React.FocusEvent<HTMLElement>) {
     const el = e.target;
-    if (!(el instanceof HTMLInputElement || el instanceof HTMLSelectElement)) return;
+    if (
+      !(
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLSelectElement ||
+        el instanceof HTMLTextAreaElement
+      )
+    )
+      return;
     // Wait for the keyboard to open so the field scrolls above it.
     window.setTimeout(() => {
       el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }, 300);
+  }
+
+  async function handleStorySave(e: FormEvent) {
+    e.preventDefault();
+    if (!story.title.trim()) {
+      setStoryError('A title is required.');
+      return;
+    }
+    setStorySaving(true);
+    setStoryError(null);
+    setStorySaved(false);
+    try {
+      const res = await fetch('/admin/api/story', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(story),
+      });
+      if (!res.ok) throw new Error();
+      setStory(await res.json());
+      setStorySaved(true);
+      window.setTimeout(() => setStorySaved(false), 2500);
+    } catch {
+      setStoryError('Could not save. Try again.');
+    } finally {
+      setStorySaving(false);
+    }
   }
 
   // Enter moves to the next field (and scrolls it into view); on the last
@@ -365,6 +422,57 @@ export default function AdminPage() {
               </div>
             </div>
           ))
+        )}
+      </section>
+
+      <section className={styles.card}>
+        <div className={styles.topBar}>
+          <p className={styles.sectionLabel}>Our Story / Ramblings text</p>
+          <Link href="/our-story" className={styles.topLink}>
+            View live page
+          </Link>
+        </div>
+
+        {storyLoading ? (
+          <p className={styles.empty}>Loading…</p>
+        ) : (
+          <form onSubmit={handleStorySave} onFocus={handleFocus}>
+            {storyError && <p className={styles.error}>{storyError}</p>}
+            <div className={styles.field}>
+              <label htmlFor="storyTitle">Title</label>
+              <input
+                id="storyTitle"
+                value={story.title}
+                onChange={(e) => setStory((s) => ({ ...s, title: e.target.value }))}
+              />
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="storyBody">Text</label>
+              <textarea
+                id="storyBody"
+                className={styles.textarea}
+                value={story.body}
+                onChange={(e) => setStory((s) => ({ ...s, body: e.target.value }))}
+                rows={10}
+                placeholder="Leave a blank line between paragraphs."
+              />
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="storySignature">Signature</label>
+              <input
+                id="storySignature"
+                value={story.signature}
+                onChange={(e) => setStory((s) => ({ ...s, signature: e.target.value }))}
+                placeholder="e.g. —Christos P."
+              />
+            </div>
+            <div className={styles.formActions}>
+              <button className={styles.button} type="submit" disabled={storySaving}>
+                {storySaving ? 'Saving…' : 'Save text'}
+              </button>
+              {storySaved && <span className={styles.savedNote}>Saved</span>}
+            </div>
+          </form>
         )}
       </section>
 
