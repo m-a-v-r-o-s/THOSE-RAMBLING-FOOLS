@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getGigs } from '@/lib/gigs';
 import { formatWhen } from '@/lib/gig-format';
+import SubpageMasthead from '../components/SubpageMasthead';
 
 // Always read the latest gigs at request time.
 export const dynamic = 'force-dynamic';
@@ -10,15 +11,7 @@ export default async function UpcomingGigs() {
 
   return (
     <div className="stage subpage">
-      <header className="masthead">
-        <Link href="/" aria-label="Back to home">
-          <img
-            className="logo"
-            src="/covers/trflogotext.webp"
-            alt="Those Rambling Fools"
-          />
-        </Link>
-      </header>
+      <SubpageMasthead />
 
       <main className="subpage-content">
         <h1 className="subpage-title">Upcoming Gigs</h1>

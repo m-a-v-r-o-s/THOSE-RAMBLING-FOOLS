@@ -61,6 +61,19 @@ body {
   .stage {
     height: 100vh;
   }
+  /* Sub-pages (Our Story / Upcoming Gigs) can grow taller than the viewport
+     (e.g. a long Ramblings post) — scroll within the stage so content past
+     the fold, including the Back link, stays reachable. */
+  .stage.subpage {
+    overflow-y: auto;
+  }
+  /* Pin the logo to the top of that scroll so it stays visible as content
+     scrolls behind it (mobile already gets this via the shared mobile rule). */
+  .stage.subpage .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
 }
 
 /* Mobile portrait: zoom the background in a touch */
@@ -102,6 +115,33 @@ body::before {
 }
 
 /* ---- Sub-pages (Our Story / Upcoming Gigs) ---- */
+/* Soft dark shadow behind the sticky logo, fading in only once it's pinned
+   and content is scrolling behind it. (.masthead is already position:sticky
+   for subpages at every width — see the mobile-shared rule and the
+   min-width:860px rule above — so it's already a positioning context.) */
+.stage.subpage .masthead::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  bottom: -12px;
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.96) 0%,
+    rgba(0, 0, 0, 0.85) 40%,
+    rgba(0, 0, 0, 0.55) 65%,
+    transparent 88%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+.stage.subpage .masthead.stuck::before {
+  opacity: 1;
+}
+
 .subpage-content {
   max-width: 720px;
   margin: 6vh auto 0;
@@ -174,6 +214,52 @@ body::before {
 .gig-map-link:hover {
   color: var(--ink);
   border-color: var(--ink);
+}
+
+/* ---- Ramblings blog: vertical tabs (shown once there are 2+ posts) ---- */
+.story-blog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+}
+.story-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 420px;
+}
+.story-tab {
+  font-family: 'Abel', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 1px solid rgba(207, 210, 214, 0.3);
+  border-radius: 6px;
+  padding: 12px 18px;
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+.story-tab:hover {
+  color: var(--ink);
+  border-color: rgba(240, 230, 192, 0.5);
+}
+.story-tab.active {
+  color: #02050f;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.story-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
 }
 
 /* ---- Side-by-side player scene ---- */

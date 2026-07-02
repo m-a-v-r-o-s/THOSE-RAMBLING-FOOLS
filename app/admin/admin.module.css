@@ -311,6 +311,81 @@
   color: #ffb5a8;
 }
 
+.delete:disabled {
+  opacity: 0.35;
+  cursor: default;
+  background: transparent;
+  color: #ff9a8a;
+}
+
+.hint {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #b8a878;
+  margin-bottom: 14px;
+}
+
+.postRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(207, 210, 214, 0.12);
+}
+
+.postRow:last-child {
+  border-bottom: none;
+}
+
+.postRow.editing {
+  border-left: 2px solid #e8c050;
+  padding-left: 12px;
+  margin-left: -14px;
+}
+
+.postRow.dragging {
+  opacity: 0.5;
+}
+
+.dragHandle {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(207, 210, 214, 0.25);
+  border-radius: 6px;
+  background: transparent;
+  color: #b8a878;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+  color: #e8c050;
+  border-color: rgba(232, 192, 80, 0.5);
+}
+
+.postInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.postPreview {
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  color: #b8a878;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .empty {
   color: #b8a878;
   font-size: 0.9rem;

@@ -10,10 +10,15 @@ import {
   type Frequency,
   type Gig,
 } from '@/lib/gig-format';
-import type { StoryContent } from '@/lib/story';
+import type { Post } from '@/lib/posts';
 import styles from './admin.module.css';
 
-const EMPTY_STORY: StoryContent = { title: '', body: '', signature: '' };
+const EMPTY_POST = { title: '', body: '', signature: '' };
+
+function postPreview(body: string, max = 90): string {
+  const firstPara = body.split(/\n\s*\n/)[0]?.replace(/\n/g, ' ').trim() ?? '';
+  return firstPara.length > max ? `${firstPara.slice(0, max).trimEnd()}…` : firstPara;
+}
 
 const EMPTY = {
   name: '',
@@ -35,11 +40,15 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const formCardRef = useRef<HTMLElement>(null);
 
-  const [story, setStory] = useState<StoryContent>(EMPTY_STORY);
-  const [storyLoading, setStoryLoading] = useState(true);
-  const [storySaving, setStorySaving] = useState(false);
-  const [storyError, setStoryError] = useState<string | null>(null);
-  const [storySaved, setStorySaved] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postForm, setPostForm] = useState(EMPTY_POST);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [postSubmitting, setPostSubmitting] = useState(false);
+  const [postError, setPostError] = useState<string | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const postFormCardRef = useRef<HTMLElement>(null);
+  const postListRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -55,24 +64,24 @@ export default function AdminPage() {
     }
   }, []);
 
-  const loadStory = useCallback(async () => {
-    setStoryLoading(true);
+  const loadPosts = useCallback(async () => {
+    setPostsLoading(true);
     try {
-      const res = await fetch('/admin/api/story', { cache: 'no-store' });
+      const res = await fetch('/admin/api/posts', { cache: 'no-store' });
       if (!res.ok) throw new Error();
-      setStory(await res.json());
-      setStoryError(null);
+      setPosts(await res.json());
+      setPostError(null);
     } catch {
-      setStoryError('Could not load the Our Story text.');
+      setPostError('Could not load posts.');
     } finally {
-      setStoryLoading(false);
+      setPostsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     load();
-    loadStory();
-  }, [load, loadStory]);
+    loadPosts();
+  }, [load, loadPosts]);
 
   const setField =
     (key: 'name' | 'location' | 'mapUrl' | 'time') =>
@@ -192,29 +201,118 @@ export default function AdminPage() {
     }, 300);
   }
 
-  async function handleStorySave(e: FormEvent) {
+  function startEditPost(post: Post) {
+    setEditingPostId(post.id);
+    setPostError(null);
+    setPostForm({ title: post.title, body: post.body, signature: post.signature });
+    postFormCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function cancelEditPost() {
+    setEditingPostId(null);
+    setPostForm(EMPTY_POST);
+    setPostError(null);
+  }
+
+  async function handlePostSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!story.title.trim()) {
-      setStoryError('A title is required.');
+    if (!postForm.title.trim()) {
+      setPostError('A title is required.');
       return;
     }
-    setStorySaving(true);
-    setStoryError(null);
-    setStorySaved(false);
+    setPostSubmitting(true);
+    setPostError(null);
     try {
-      const res = await fetch('/admin/api/story', {
+      const res = await fetch(
+        editingPostId ? `/admin/api/posts/${editingPostId}` : '/admin/api/posts',
+        {
+          method: editingPostId ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(postForm),
+        }
+      );
+      if (!res.ok) throw new Error();
+      setPostForm(EMPTY_POST);
+      setEditingPostId(null);
+      await loadPosts();
+    } catch {
+      setPostError(
+        editingPostId ? 'Could not save changes. Try again.' : 'Could not add the post. Try again.'
+      );
+    } finally {
+      setPostSubmitting(false);
+    }
+  }
+
+  async function handleDeletePost(id: string, title: string) {
+    if (!window.confirm(`Delete "${title}"?`)) return;
+    setPostError(null);
+    try {
+      const res = await fetch(`/admin/api/posts/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || 'Could not delete the post.');
+      }
+      await loadPosts();
+    } catch (err) {
+      setPostError(err instanceof Error ? err.message : 'Could not delete the post. Try again.');
+    }
+  }
+
+  // Drag-to-reorder for the posts list. Uses Pointer Events (unified for
+  // mouse/touch/pen) with the handle capturing the pointer, so move/up events
+  // keep firing on it wherever the finger/cursor goes.
+  function handlePostPointerDown(index: number, e: React.PointerEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setDragIndex(index);
+  }
+
+  function handlePostPointerMove(e: React.PointerEvent<HTMLButtonElement>) {
+    if (dragIndex === null) return;
+    const container = postListRef.current;
+    if (!container) return;
+    const rows = Array.from(container.querySelectorAll<HTMLElement>('[data-post-index]'));
+    if (rows.length === 0) return;
+
+    const hovered = document.elementFromPoint(e.clientX, e.clientY);
+    const row = hovered?.closest<HTMLElement>('[data-post-index]');
+    let overIndex: number | null = null;
+
+    if (row) {
+      overIndex = Number(row.dataset.postIndex);
+    } else {
+      const firstRect = rows[0].getBoundingClientRect();
+      const lastRect = rows[rows.length - 1].getBoundingClientRect();
+      if (e.clientY < firstRect.top) overIndex = 0;
+      else if (e.clientY > lastRect.bottom) overIndex = rows.length - 1;
+    }
+
+    if (overIndex === null || Number.isNaN(overIndex) || overIndex === dragIndex) return;
+
+    const targetIndex = overIndex;
+    setPosts((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(dragIndex, 1);
+      next.splice(targetIndex, 0, moved);
+      return next;
+    });
+    setDragIndex(targetIndex);
+  }
+
+  async function handlePostPointerUp(e: React.PointerEvent<HTMLButtonElement>) {
+    if (dragIndex === null) return;
+    setDragIndex(null);
+    try {
+      const res = await fetch('/admin/api/posts/reorder', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(story),
+        body: JSON.stringify({ ids: posts.map((p) => p.id) }),
       });
       if (!res.ok) throw new Error();
-      setStory(await res.json());
-      setStorySaved(true);
-      window.setTimeout(() => setStorySaved(false), 2500);
     } catch {
-      setStoryError('Could not save. Try again.');
-    } finally {
-      setStorySaving(false);
+      setPostError('Could not save the new order. Try again.');
+      await loadPosts();
     }
   }
 
@@ -425,54 +523,108 @@ export default function AdminPage() {
         )}
       </section>
 
-      <section className={styles.card}>
+      <section className={styles.card} ref={postFormCardRef}>
         <div className={styles.topBar}>
-          <p className={styles.sectionLabel}>Our Story / Ramblings text</p>
+          <p className={styles.sectionLabel}>{editingPostId ? 'Edit post' : 'Add a post'}</p>
           <Link href="/our-story" className={styles.topLink}>
             View live page
           </Link>
         </div>
 
-        {storyLoading ? (
-          <p className={styles.empty}>Loading…</p>
-        ) : (
-          <form onSubmit={handleStorySave} onFocus={handleFocus}>
-            {storyError && <p className={styles.error}>{storyError}</p>}
-            <div className={styles.field}>
-              <label htmlFor="storyTitle">Title</label>
-              <input
-                id="storyTitle"
-                value={story.title}
-                onChange={(e) => setStory((s) => ({ ...s, title: e.target.value }))}
-              />
-            </div>
-            <div className={styles.field}>
-              <label htmlFor="storyBody">Text</label>
-              <textarea
-                id="storyBody"
-                className={styles.textarea}
-                value={story.body}
-                onChange={(e) => setStory((s) => ({ ...s, body: e.target.value }))}
-                rows={10}
-                placeholder="Leave a blank line between paragraphs."
-              />
-            </div>
-            <div className={styles.field}>
-              <label htmlFor="storySignature">Signature</label>
-              <input
-                id="storySignature"
-                value={story.signature}
-                onChange={(e) => setStory((s) => ({ ...s, signature: e.target.value }))}
-                placeholder="e.g. —Christos P."
-              />
-            </div>
-            <div className={styles.formActions}>
-              <button className={styles.button} type="submit" disabled={storySaving}>
-                {storySaving ? 'Saving…' : 'Save text'}
+        <form onSubmit={handlePostSubmit} onFocus={handleFocus}>
+          {postError && <p className={styles.error}>{postError}</p>}
+          <div className={styles.field}>
+            <label htmlFor="postTitle">Title</label>
+            <input
+              id="postTitle"
+              value={postForm.title}
+              onChange={(e) => setPostForm((s) => ({ ...s, title: e.target.value }))}
+              placeholder="Post title"
+            />
+          </div>
+          <div className={styles.field}>
+            <label htmlFor="postBody">Text</label>
+            <textarea
+              id="postBody"
+              className={styles.textarea}
+              value={postForm.body}
+              onChange={(e) => setPostForm((s) => ({ ...s, body: e.target.value }))}
+              rows={10}
+              placeholder="Leave a blank line between paragraphs."
+            />
+          </div>
+          <div className={styles.field}>
+            <label htmlFor="postSignature">Signature</label>
+            <input
+              id="postSignature"
+              value={postForm.signature}
+              onChange={(e) => setPostForm((s) => ({ ...s, signature: e.target.value }))}
+              placeholder="e.g. —Christos P."
+            />
+          </div>
+          <div className={styles.formActions}>
+            <button className={styles.button} type="submit" disabled={postSubmitting}>
+              {postSubmitting ? 'Saving…' : editingPostId ? 'Save changes' : 'Add post'}
+            </button>
+            {editingPostId && (
+              <button type="button" className={styles.cancel} onClick={cancelEditPost}>
+                Cancel
               </button>
-              {storySaved && <span className={styles.savedNote}>Saved</span>}
-            </div>
-          </form>
+            )}
+          </div>
+        </form>
+      </section>
+
+      <section className={styles.card}>
+        <p className={styles.sectionLabel}>Ramblings posts</p>
+        {posts.length > 1 && (
+          <p className={styles.hint}>Drag the handle to reorder. Newest posts start on top.</p>
+        )}
+        {postsLoading ? (
+          <p className={styles.empty}>Loading…</p>
+        ) : posts.length === 0 ? (
+          <p className={styles.empty}>No posts yet — add one above.</p>
+        ) : (
+          <div ref={postListRef}>
+            {posts.map((post, index) => (
+              <div
+                key={post.id}
+                data-post-index={index}
+                className={`${styles.postRow}${dragIndex === index ? ` ${styles.dragging}` : ''}${editingPostId === post.id ? ` ${styles.editing}` : ''}`}
+              >
+                {posts.length > 1 && (
+                  <button
+                    type="button"
+                    className={styles.dragHandle}
+                    onPointerDown={(e) => handlePostPointerDown(index, e)}
+                    onPointerMove={handlePostPointerMove}
+                    onPointerUp={handlePostPointerUp}
+                    onPointerCancel={handlePostPointerUp}
+                    aria-label={`Drag to reorder "${post.title}"`}
+                  >
+                    ⠿
+                  </button>
+                )}
+                <div className={styles.postInfo}>
+                  <div className={styles.gigName}>{post.title}</div>
+                  <div className={styles.postPreview}>{postPreview(post.body)}</div>
+                </div>
+                <div className={styles.gigActions}>
+                  <button className={styles.edit} onClick={() => startEditPost(post)}>
+                    Edit
+                  </button>
+                  <button
+                    className={styles.delete}
+                    onClick={() => handleDeletePost(post.id, post.title)}
+                    disabled={posts.length <= 1}
+                    title={posts.length <= 1 ? 'Keep at least one post' : undefined}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </section>
 
