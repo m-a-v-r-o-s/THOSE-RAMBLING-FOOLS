@@ -89,6 +89,16 @@ export async function addGig(input: GigInput): Promise<Gig> {
   return gig;
 }
 
+export async function updateGig(id: string, input: GigInput): Promise<Gig | null> {
+  const gigs = await getGigs();
+  const index = gigs.findIndex((g) => g.id === id);
+  if (index === -1) return null;
+  const updated: Gig = { ...input, id };
+  gigs[index] = updated;
+  await saveGigs(gigs);
+  return updated;
+}
+
 export async function deleteGig(id: string): Promise<boolean> {
   const gigs = await getGigs();
   const next = gigs.filter((g) => g.id !== id);

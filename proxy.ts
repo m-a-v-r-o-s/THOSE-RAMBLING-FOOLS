@@ -1,8 +1,19 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { SESSION_COOKIE, sessionToken } from '@/lib/admin-auth';
 
-// Protects /admin (the panel + its API) with HTTP Basic auth.
+// Guards everything under /admin with a cookie session (set by /admin/login).
 // Set ADMIN_USER and ADMIN_PASSWORD in the environment (Railway variables).
-export function proxy(req: NextRequest) {
+
+// Reachable without a session (otherwise you could never log in).
+const PUBLIC_PATHS = ['/admin/login', '/admin/api/login'];
+
+export async function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+    return NextResponse.next();
+  }
+
   const user = process.env.ADMIN_USER;
   const pass = process.env.ADMIN_PASSWORD;
 
@@ -13,21 +24,22 @@ export function proxy(req: NextRequest) {
     return new NextResponse('Admin is not configured.', { status: 503 });
   }
 
-  const header = req.headers.get('authorization');
-  if (header?.startsWith('Basic ')) {
-    const decoded = atob(header.slice(6));
-    const sep = decoded.indexOf(':');
-    const givenUser = decoded.slice(0, sep);
-    const givenPass = decoded.slice(sep + 1);
-    if (givenUser === user && givenPass === pass) {
-      return NextResponse.next();
-    }
+  const cookie = req.cookies.get(SESSION_COOKIE)?.value;
+  const expected = await sessionToken(user, pass);
+  if (cookie && cookie === expected) {
+    return NextResponse.next();
   }
 
-  return new NextResponse('Authentication required.', {
-    status: 401,
-    headers: { 'WWW-Authenticate': 'Basic realm="TRF Admin", charset="UTF-8"' },
-  });
+  // Not signed in: APIs get a clean 401 (so fetch() can handle it), page
+  // requests are redirected to the styled login page.
+  if (pathname.startsWith('/admin/api/')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const loginUrl = req.nextUrl.clone();
+  loginUrl.pathname = '/admin/login';
+  loginUrl.search = '';
+  return NextResponse.redirect(loginUrl);
 }
 
 export const config = {

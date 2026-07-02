@@ -73,6 +73,47 @@ export function formatWhen(gig: Gig): string {
   }
 }
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+// Validates/normalises a raw request body into a GigInput.
+// Shared by the create (POST) and edit (PUT) routes.
+export function parseGigInput(
+  body: any
+): { input: GigInput } | { error: string } {
+  if (!body || typeof body.name !== 'string' || !body.name.trim()) {
+    return { error: 'A name is required.' };
+  }
+
+  const frequency: Frequency = FREQUENCIES.includes(body.frequency)
+    ? body.frequency
+    : 'once';
+
+  const validDates: string[] = Array.isArray(body.dates)
+    ? body.dates.filter((d: unknown): d is string => typeof d === 'string' && DATE_RE.test(d))
+    : [];
+
+  const input: GigInput = {
+    name: String(body.name).trim(),
+    location: String(body.location ?? '').trim(),
+    mapUrl: body.mapUrl ? String(body.mapUrl).trim() : undefined,
+    time: body.time ? String(body.time).trim() : undefined,
+    frequency,
+  };
+
+  if (frequency === 'weekly' || frequency === 'biweekly') {
+    const wd = Number(body.weekday);
+    input.weekday = Number.isInteger(wd) && wd >= 0 && wd <= 6 ? wd : 0;
+  } else if (frequency === 'once') {
+    if (validDates.length === 0) return { error: 'A date is required.' };
+    input.dates = validDates.slice(0, 1);
+  } else if (frequency === 'custom') {
+    if (validDates.length === 0) return { error: 'At least one date is required.' };
+    input.dates = validDates;
+  }
+
+  return { input };
+}
+
 // Removes gigs/dates that are in the past.
 // - one-off: dropped once its date is before today (i.e. the day after the gig).
 // - custom: past dates are removed; upcoming dates stay; the gig is dropped

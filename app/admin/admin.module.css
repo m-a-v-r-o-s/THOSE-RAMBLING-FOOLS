@@ -179,6 +179,29 @@
   cursor: default;
 }
 
+.formActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cancel {
+  font-family: 'Abel', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: #cfd2d6;
+  background: transparent;
+  border: none;
+  padding: 6px 4px;
+  cursor: pointer;
+}
+
+.cancel:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
 .error {
   color: #ff9a8a;
   font-size: 0.85rem;
@@ -197,6 +220,38 @@
 
 .gig:last-child {
   border-bottom: none;
+}
+
+.gig.editing {
+  border-left: 2px solid #e8c050;
+  padding-left: 12px;
+  margin-left: -14px;
+}
+
+.gigActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.edit {
+  font-family: 'Abel', sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: #e8c050;
+  background: transparent;
+  border: 1px solid rgba(232, 192, 80, 0.5);
+  border-radius: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.edit:hover {
+  background: rgba(232, 192, 80, 0.15);
+  color: #f2d270;
 }
 
 .gigName {
@@ -258,13 +313,45 @@
   border-bottom: 1px solid rgba(207, 210, 214, 0.4);
 }
 
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
 .topLink {
   display: inline-block;
-  margin-bottom: 28px;
   font-size: 0.75rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #cfd2d6;
   text-decoration: none;
   border-bottom: 1px solid rgba(207, 210, 214, 0.4);
+}
+
+.logout {
+  flex-shrink: 0;
+  font-family: 'Abel', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b8a878;
+  background: transparent;
+  border: 1px solid rgba(184, 168, 120, 0.4);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.logout:hover {
+  color: #f0e6c0;
+  border-color: rgba(240, 230, 192, 0.7);
+}
+
+.loginBox {
+  max-width: 400px;
+  margin: 12vh auto 0;
 }

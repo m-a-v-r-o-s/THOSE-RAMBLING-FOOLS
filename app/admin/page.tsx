@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import {
   FREQUENCIES,
   FREQUENCY_LABELS,
@@ -27,8 +27,10 @@ export default function AdminPage() {
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const formCardRef = useRef<HTMLElement>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -72,7 +74,30 @@ export default function AdminPage() {
     });
   }
 
-  async function handleAdd(e: FormEvent) {
+  function startEdit(gig: Gig) {
+    setEditingId(gig.id);
+    setError(null);
+    setForm({
+      name: gig.name,
+      location: gig.location ?? '',
+      mapUrl: gig.mapUrl ?? '',
+      time: gig.time ?? '',
+      frequency: gig.frequency ?? 'once',
+      weekday: gig.weekday ?? 0,
+      onceDate: gig.frequency === 'once' ? gig.dates?.[0] ?? '' : '',
+      customDates:
+        gig.frequency === 'custom' && gig.dates?.length ? gig.dates : [''],
+    });
+    formCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setForm(EMPTY);
+    setError(null);
+  }
+
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!form.name.trim()) {
       setError('The venue/bar name is required.');
@@ -97,24 +122,30 @@ export default function AdminPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch('/admin/api/gigs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          location: form.location,
-          mapUrl: form.mapUrl,
-          time: form.time,
-          frequency: form.frequency,
-          weekday: form.weekday,
-          dates,
-        }),
-      });
+      const res = await fetch(
+        editingId ? `/admin/api/gigs/${editingId}` : '/admin/api/gigs',
+        {
+          method: editingId ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: form.name,
+            location: form.location,
+            mapUrl: form.mapUrl,
+            time: form.time,
+            frequency: form.frequency,
+            weekday: form.weekday,
+            dates,
+          }),
+        }
+      );
       if (!res.ok) throw new Error();
       setForm(EMPTY);
+      setEditingId(null);
       await load();
     } catch {
-      setError('Could not add the gig. Try again.');
+      setError(
+        editingId ? 'Could not save changes. Try again.' : 'Could not add the gig. Try again.'
+      );
     } finally {
       setSubmitting(false);
     }
@@ -155,6 +186,15 @@ export default function AdminPage() {
     }
   }
 
+  async function handleLogout() {
+    try {
+      await fetch('/admin/api/logout', { method: 'POST' });
+    } catch {
+      // ignore — navigate away regardless
+    }
+    window.location.href = '/admin/login';
+  }
+
   async function handleDelete(id: string, name: string) {
     if (!window.confirm(`Delete "${name}"?`)) return;
     setError(null);
@@ -176,15 +216,20 @@ export default function AdminPage() {
         Add upcoming gigs and remove old ones. Changes go live on the Upcoming Gigs page immediately.
       </p>
 
-      <Link href="/upcoming-gigs" className={styles.topLink}>
-        View live gig list
-      </Link>
+      <div className={styles.topBar}>
+        <Link href="/upcoming-gigs" className={styles.topLink}>
+          View live gig list
+        </Link>
+        <button type="button" className={styles.logout} onClick={handleLogout}>
+          Log out
+        </button>
+      </div>
 
       {error && <p className={styles.error}>{error}</p>}
 
-      <section className={styles.card}>
-        <p className={styles.sectionLabel}>Add a gig</p>
-        <form onSubmit={handleAdd} onKeyDown={handleKeyDown} onFocus={handleFocus}>
+      <section className={styles.card} ref={formCardRef}>
+        <p className={styles.sectionLabel}>{editingId ? 'Edit gig' : 'Add a gig'}</p>
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} onFocus={handleFocus}>
           <div className={styles.field}>
             <label htmlFor="name">Venue / name *</label>
             <input id="name" value={form.name} onChange={setField('name')} placeholder="Venue or bar name" enterKeyHint="next" />
@@ -274,9 +319,20 @@ export default function AdminPage() {
             <label htmlFor="mapUrl">Google Maps link</label>
             <input id="mapUrl" value={form.mapUrl} onChange={setField('mapUrl')} placeholder="Google Maps link (optional)" inputMode="url" enterKeyHint="done" />
           </div>
-          <button className={styles.button} type="submit" disabled={submitting}>
-            {submitting ? 'Adding…' : 'Add gig'}
-          </button>
+          <div className={styles.formActions}>
+            <button className={styles.button} type="submit" disabled={submitting}>
+              {submitting
+                ? 'Saving…'
+                : editingId
+                ? 'Save changes'
+                : 'Add gig'}
+            </button>
+            {editingId && (
+              <button type="button" className={styles.cancel} onClick={cancelEdit}>
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       </section>
 
@@ -288,7 +344,10 @@ export default function AdminPage() {
           <p className={styles.empty}>No gigs yet — add one above.</p>
         ) : (
           gigs.map((g) => (
-            <div className={styles.gig} key={g.id}>
+            <div
+              className={`${styles.gig}${editingId === g.id ? ` ${styles.editing}` : ''}`}
+              key={g.id}
+            >
               <div>
                 <div className={styles.gigName}>{g.name}</div>
                 <div className={styles.gigDetails}>
@@ -296,9 +355,14 @@ export default function AdminPage() {
                 </div>
                 {g.mapUrl && <div className={styles.gigLink}>{g.mapUrl}</div>}
               </div>
-              <button className={styles.delete} onClick={() => handleDelete(g.id, g.name)}>
-                Delete
-              </button>
+              <div className={styles.gigActions}>
+                <button className={styles.edit} onClick={() => startEdit(g)}>
+                  Edit
+                </button>
+                <button className={styles.delete} onClick={() => handleDelete(g.id, g.name)}>
+                  Delete
+                </button>
+              </div>
             </div>
           ))
         )}
