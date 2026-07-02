@@ -1,0 +1,270 @@
+.wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+  font-family: 'Abel', sans-serif;
+  color: #f0e6c0;
+  /* Own scroll container so the panel scrolls even though the global layout
+     locks html/body to the viewport on desktop. */
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* On phones, leave room below so the last fields can scroll above the keyboard */
+@media (max-width: 640px) {
+  .wrap {
+    padding-bottom: 55vh;
+  }
+}
+
+.title {
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-size: 1.6rem;
+  color: #cfd2d6;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  letter-spacing: 0.1em;
+  font-size: 0.85rem;
+  color: #b8a878;
+  margin-bottom: 32px;
+}
+
+.card {
+  background: transparent;
+  border: 1px solid rgba(207, 210, 214, 0.18);
+  border-radius: 10px;
+  padding: 22px;
+  margin-bottom: 32px;
+}
+
+.sectionLabel {
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  color: #b8a878;
+  margin-bottom: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field label {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b8a878;
+}
+
+.field input,
+.field select {
+  font-family: 'Abel', sans-serif;
+  font-size: 1rem;
+  color: #f0e6c0;
+  background: #2b2b2b;
+  border: 1px solid rgba(207, 210, 214, 0.25);
+  border-radius: 6px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: #e8c050;
+}
+
+.field input::placeholder {
+  color: #f0e6c0;
+  opacity: 0.35;
+}
+
+.field select {
+  appearance: none;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, #b8a878 50%),
+    linear-gradient(135deg, #b8a878 50%, transparent 50%);
+  background-position: calc(100% - 18px) center, calc(100% - 13px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+}
+
+.field select option {
+  color: #f0e6c0;
+  background: #2b2b2b;
+}
+
+/* Colour the native date-picker icon so it's visible on the dark input */
+.field input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+}
+
+.dateRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dateRow input {
+  flex: 1;
+}
+
+.removeDate {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 154, 138, 0.5);
+  border-radius: 6px;
+  background: transparent;
+  color: #ff9a8a;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.removeDate:hover {
+  background: rgba(255, 154, 138, 0.15);
+}
+
+.addDate {
+  align-self: flex-start;
+  margin-top: 2px;
+  font-family: 'Abel', sans-serif;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: #e8c050;
+  background: transparent;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.addDate:hover {
+  text-decoration: underline;
+}
+
+.button {
+  font-family: 'Abel', sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: #02050f;
+  background: #e8c050;
+  border: none;
+  border-radius: 6px;
+  padding: 11px 22px;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.08s ease;
+}
+
+.button:hover {
+  filter: brightness(1.08);
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.error {
+  color: #ff9a8a;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+}
+
+.gig {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(207, 210, 214, 0.12);
+}
+
+.gig:last-child {
+  border-bottom: none;
+}
+
+.gigName {
+  font-size: 1.05rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f0e6c0;
+  margin-bottom: 4px;
+}
+
+.gigDetails {
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: #b8a878;
+}
+
+.gigLink {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: #8fb0d8;
+  word-break: break-all;
+}
+
+.delete {
+  flex-shrink: 0;
+  font-family: 'Abel', sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: #ff9a8a;
+  background: transparent;
+  border: 1px solid rgba(255, 154, 138, 0.5);
+  border-radius: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.delete:hover {
+  background: rgba(255, 154, 138, 0.15);
+  color: #ffb5a8;
+}
+
+.empty {
+  color: #b8a878;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  padding: 8px 0;
+}
+
+.backLink {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #cfd2d6;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(207, 210, 214, 0.4);
+}
+
+.topLink {
+  display: inline-block;
+  margin-bottom: 28px;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #cfd2d6;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(207, 210, 214, 0.4);
+}
