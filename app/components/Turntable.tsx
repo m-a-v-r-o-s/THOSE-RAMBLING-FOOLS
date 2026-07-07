@@ -17,6 +17,7 @@ export default function Turntable() {
     hintDismissed,
     dismissHint,
     selectAlbum,
+    playRandomAlbum,
     togglePlay,
     eject,
     seek,
@@ -111,11 +112,11 @@ export default function Turntable() {
               className="start-stop-btn"
               onClick={() => {
                 dismissHint();
-                togglePlay();
+                if (currentAlbum) togglePlay();
+                else playRandomAlbum();
               }}
-              disabled={!currentAlbum}
               style={{ backgroundImage: `url('${startStopImg}')` }}
-              aria-label="Start or stop playback"
+              aria-label={currentAlbum ? 'Start or stop playback' : 'Play a random album'}
               title="Start / Stop"
             />
           </div>

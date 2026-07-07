@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { Album } from '../albums';
+import { ALBUMS, type Album } from '../albums';
 
 type AudioCtx = {
   currentAlbum: Album | null;
@@ -22,6 +22,7 @@ type AudioCtx = {
   hintDismissed: boolean;
   dismissHint: () => void;
   selectAlbum: (album: Album) => void;
+  playRandomAlbum: () => void;
   togglePlay: () => void;
   eject: () => void;
   seek: (delta: number) => void;
@@ -98,6 +99,29 @@ export default function AudioProvider({ children }: { children: ReactNode }) {
     [currentAlbum]
   );
 
+  // Pressing Start with nothing loaded: drop a random disk on and play it
+  // straight away, instead of just sitting there disabled.
+  const playRandomAlbum = useCallback(() => {
+    const album = ALBUMS[Math.floor(Math.random() * ALBUMS.length)];
+    if (playTimeout.current) clearTimeout(playTimeout.current);
+    setRecordLabelImg(album.cover);
+    setIsRecordVisible(true);
+    setIsRecordPlaying(false);
+    setIsPaused(false);
+    setIsTonearmDown(true);
+    setIsNowPlayingVisible(true);
+    setCurrentAlbum(album);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.src = album.audio;
+      audio.load();
+    }
+    playTimeout.current = setTimeout(() => {
+      setIsRecordPlaying(true);
+      audioRef.current?.play();
+    }, 1100);
+  }, []);
+
   const eject = useCallback(() => {
     if (playTimeout.current) clearTimeout(playTimeout.current);
     const audio = audioRef.current;
@@ -158,6 +182,7 @@ export default function AudioProvider({ children }: { children: ReactNode }) {
         hintDismissed,
         dismissHint,
         selectAlbum,
+        playRandomAlbum,
         togglePlay,
         eject,
         seek,
