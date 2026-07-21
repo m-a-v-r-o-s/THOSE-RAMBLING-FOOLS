@@ -28,7 +28,7 @@ export default function SubpageMasthead() {
         <Link href="/" aria-label="Back to home">
           <img
             className="logo"
-            src="/covers/trflogotext.webp"
+            src="/covers/newlogo.webp"
             alt="Those Rambling Fools"
           />
         </Link>

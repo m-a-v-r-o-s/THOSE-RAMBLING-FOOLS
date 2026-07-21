@@ -5,7 +5,7 @@ import AudioProvider from './components/AudioProvider';
 export const metadata: Metadata = {
   title: 'Those Rambling Fools',
   description: 'Discography & turntable for the band Those Rambling Fools.',
-  icons: { icon: 'data:,' },
+  icons: { icon: '/covers/favicon.ico' },
 };
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         {/* Preload critical above-the-fold images */}
-        <link rel="preload" as="image" href="/covers/trflogotext.webp" />
+        <link rel="preload" as="image" href="/covers/newlogo.webp" />
         <link rel="preload" as="image" href="/covers/playeronlynew.webp" />
         <link
           rel="preload"
@@ -38,7 +38,7 @@ export default function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="/covers/finafinallbg.png"
+          href="/covers/finafinallbg.webp"
           media="(min-width: 860px)"
         />
       </head>

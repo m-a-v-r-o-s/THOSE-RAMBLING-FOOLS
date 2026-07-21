@@ -23,7 +23,7 @@ export default function Masthead() {
       <header className={`masthead${stuck ? ' stuck' : ''}`}>
         <img
           className="logo"
-          src="/covers/trflogotext.webp"
+          src="/covers/newlogo.webp"
           alt="Those Rambling Fools"
           fetchPriority="high"
         />

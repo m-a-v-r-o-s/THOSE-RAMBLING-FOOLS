@@ -41,6 +41,33 @@ export default function Turntable() {
     ? '/covers/buttonstart.webp'
     : '/covers/buttonstop.webp';
 
+  const renderPick = (al: Album, extraClass = '') => (
+    <button
+      key={al.key}
+      ref={(el) => { buttonRefs.current[al.key] = el; }}
+      className={[
+        'vinyl-pick',
+        al.key,
+        extraClass,
+        currentAlbum?.key === al.key ? 'selected active' : '',
+      ].filter(Boolean).join(' ')}
+      onClick={() => handlePick(al)}
+      aria-label={
+        currentAlbum?.key === al.key
+          ? `Eject album ${al.title}`
+          : `Play album ${al.title}`
+      }
+    >
+      <div className="sleeve" style={{ backgroundImage: `url('${al.cover}')` }} />
+      <div className="vinyl-disc">
+        <div className="label" style={{ backgroundImage: `url('${al.label ?? al.cover}')` }} />
+      </div>
+    </button>
+  );
+
+  const albumThree = ALBUMS.find((al) => al.key === 'album-3')!;
+  const albumFive = ALBUMS.find((al) => al.key === 'album-5')!;
+
   return (
     <>
       <div className="player-scene">
@@ -54,28 +81,7 @@ export default function Turntable() {
         {/* Left sidebar — albums I & II */}
         <div className="album-sidebar">
           <nav className="shelf">
-            {ALBUMS.slice(0, 2).map((al) => (
-              <button
-                key={al.key}
-                ref={(el) => { buttonRefs.current[al.key] = el; }}
-                className={[
-                  'vinyl-pick',
-                  al.key,
-                  currentAlbum?.key === al.key ? 'selected active' : '',
-                ].filter(Boolean).join(' ')}
-                onClick={() => handlePick(al)}
-                aria-label={
-                  currentAlbum?.key === al.key
-                    ? `Eject album ${al.title}`
-                    : `Play album ${al.title}`
-                }
-              >
-                <div className="sleeve" style={{ backgroundImage: `url('${al.cover}')` }} />
-                <div className="vinyl-disc">
-                  <div className="label" style={{ backgroundImage: `url('${al.cover}')` }} />
-                </div>
-              </button>
-            ))}
+            {ALBUMS.slice(0, 2).map((al) => renderPick(al))}
           </nav>
         </div>
 
@@ -93,7 +99,7 @@ export default function Turntable() {
                   ].filter(Boolean).join(' ')}
                 >
                   <div
-                    className="record-label"
+                    className={`record-label${currentAlbum?.key === 'album-3' ? ' alt-label' : ''}`}
                     style={{
                       backgroundImage: recordLabelImg
                         ? `url('${recordLabelImg}')`
@@ -143,41 +149,31 @@ export default function Turntable() {
             </svg>
             <span className="spin-hint-text">Press to spin</span>
           </div>
+
+          {/* Album III floated just above the turntable on desktop. Hidden on
+              mobile, where it stays in the shelf row below. */}
+          {renderPick(albumThree, 'above-turntable')}
         </div>
 
-        {/* Right sidebar — albums III & IV */}
+        {/* Right sidebar — albums III, IV & V as a row on mobile. On desktop III
+            floats above the turntable and IV/V stack here, mirroring I & II —
+            see the `above-turntable` / `shelf-triple` desktop rules in
+            globals.css. */}
         <div className="album-sidebar">
-          <nav className="shelf">
-            {ALBUMS.slice(2, 4).map((al) => (
-              <button
-                key={al.key}
-                ref={(el) => { buttonRefs.current[al.key] = el; }}
-                className={[
-                  'vinyl-pick',
-                  al.key,
-                  currentAlbum?.key === al.key ? 'selected active' : '',
-                ].filter(Boolean).join(' ')}
-                onClick={() => handlePick(al)}
-                aria-label={
-                  currentAlbum?.key === al.key
-                    ? `Eject album ${al.title}`
-                    : `Play album ${al.title}`
-                }
-              >
-                <div className="sleeve" style={{ backgroundImage: `url('${al.cover}')` }} />
-                <div className="vinyl-disc">
-                  <div className="label" style={{ backgroundImage: `url('${al.cover}')` }} />
-                </div>
-              </button>
-            ))}
+          <nav className="shelf shelf-triple">
+            {ALBUMS.slice(2, 5).map((al) => renderPick(al))}
           </nav>
         </div>
 
-        <Link href="/upcoming-gigs" className="side-link side-link-right">
-          <img src="/covers/gigs.webp" className="side-link-img" alt="Upcoming Gigs" />
-          <img src="/covers/buttonhor.webp" className="side-link-img-mobile" alt="Upcoming Gigs" />
-          <span className="side-link-text">Upcoming Gigs</span>
-        </Link>
+        <div className="side-link-cluster">
+          {renderPick(albumThree, 'cluster-pick')}
+          <Link href="/upcoming-gigs" className="side-link side-link-right">
+            <img src="/covers/gigs.webp" className="side-link-img" alt="Upcoming Gigs" />
+            <img src="/covers/buttonhor.webp" className="side-link-img-mobile" alt="Upcoming Gigs" />
+            <span className="side-link-text">Upcoming Gigs</span>
+          </Link>
+          {renderPick(albumFive, 'cluster-pick')}
+        </div>
 
       </div>
 

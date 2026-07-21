@@ -83,7 +83,7 @@ export default function AudioProvider({ children }: { children: ReactNode }) {
     (album: Album) => {
       if (currentAlbum?.key === album.key) return;
       if (playTimeout.current) clearTimeout(playTimeout.current);
-      setRecordLabelImg(album.cover);
+      setRecordLabelImg(album.label ?? album.cover);
       setIsRecordVisible(true);
       setIsRecordPlaying(false);
       setIsPaused(true);
@@ -99,12 +99,12 @@ export default function AudioProvider({ children }: { children: ReactNode }) {
     [currentAlbum]
   );
 
-  // Pressing Start with nothing loaded: drop a random disk on and play it
+  // Pressing Start with nothing loaded: drops a random disk on and plays it
   // straight away, instead of just sitting there disabled.
   const playRandomAlbum = useCallback(() => {
     const album = ALBUMS[Math.floor(Math.random() * ALBUMS.length)];
     if (playTimeout.current) clearTimeout(playTimeout.current);
-    setRecordLabelImg(album.cover);
+    setRecordLabelImg(album.label ?? album.cover);
     setIsRecordVisible(true);
     setIsRecordPlaying(false);
     setIsPaused(false);

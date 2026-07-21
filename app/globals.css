@@ -49,7 +49,7 @@ body {
   body {
     background:
       var(--scene-overlay),
-      url('/covers/finafinallbg.png') center center / auto 140% no-repeat fixed,
+      url('/covers/finafinallbg.webp') center center / auto 140% no-repeat fixed,
       #000;
   }
   /* Lock the page to the viewport — no scrolling, everything fixed */
@@ -60,6 +60,10 @@ body {
   }
   .stage {
     height: 100vh;
+    /* The home page is tuned to fit exactly, so this is a no-op in normal
+       conditions — but on a resolution where content would still overflow
+       and clip the footer/copyright, scroll instead of hiding it. */
+    overflow-y: auto;
   }
   /* Sub-pages (Our Story / Upcoming Gigs) can grow taller than the viewport
      (e.g. a long Ramblings post) — scroll within the stage so content past
@@ -112,6 +116,21 @@ body::before {
   width: clamp(440px, 64vw, 860px);
   height: auto;
   margin: 0 auto;
+}
+/* Logo position nudge. Relative offsets (not a transform) so they don't clash
+   with the `.logo` transforms on mobile. */
+.masthead .logo {
+  position: relative;
+}
+/* Up on desktop — home only: the subpage masthead is sticky at the very top of
+   the viewport, where nudging the logo up would clip it. */
+@media (min-width: 861px) {
+  .stage:not(.subpage) .masthead .logo { top: -15px; }
+}
+/* Right on mobile — applied to the home and subpage mastheads alike so the
+   subpage back-home logo lines up exactly with the main page. */
+@media (max-width: 860px) {
+  .masthead .logo { left: 15px; }
 }
 
 /* ---- Sub-pages (Our Story / Upcoming Gigs) ---- */
@@ -308,6 +327,24 @@ body::before {
 .side-link-img-mobile {
   display: none;
 }
+/* Wraps the Upcoming Gigs link. On mobile this just holds the link (the
+   flanking picks are hidden); on desktop it stacks III / link / V. */
+.side-link-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* The cluster holds only the Upcoming Gigs link now — its flanking album picks
+   (III & V) live in the shelf / centre instead, so hide the cluster picks at
+   every width. */
+.cluster-pick {
+  display: none;
+}
+/* Album III has a desktop-only copy floated above the turntable (positioned in
+   the min-width:860 block). Hidden by default so it only shows on desktop. */
+.above-turntable {
+  display: none;
+}
 @media (min-width: 860px) {
   .side-link-img {
     display: block;
@@ -336,6 +373,64 @@ body::before {
   }
   .side-link-left:hover {
     transform: translateX(14px) rotate(-7deg) translateY(-8px);
+  }
+  .side-link-cluster {
+    flex-shrink: 0;
+    gap: 20px;
+  }
+  /* .side-link-cluster has no definite width of its own (unlike the shelves,
+     which inherit width from .album-sidebar's flex:1), so the base
+     .vinyl-pick { width:100% } can't resolve and collapses small. Give the
+     cluster discs an explicit size instead so they match the others. */
+  .side-link-cluster .vinyl-pick {
+    width: 227px;
+    max-width: 227px;
+  }
+  .side-link-cluster .vinyl-pick.album-5 {
+    margin-top: 24px;
+    margin-left: -30px;
+    /* Base tilt is rotate(-3deg) (leaning left); on desktop lean it to the
+       right a bit instead. */
+    transform: rotate(19deg);
+  }
+  .side-link-cluster .vinyl-pick.album-5:hover {
+    transform: rotate(19deg) translateY(-8px);
+  }
+  /* Spin just the record to the left and slide it left within the case; the
+     sleeve keeps its rightward lean. translateX comes first so the shift is
+     horizontal in page space rather than along the rotated axis. */
+  .side-link-cluster .vinyl-pick.album-5 .vinyl-disc {
+    transform: translateX(-22px) rotate(-15deg);
+  }
+  .side-link-cluster .vinyl-pick.album-3 {
+    margin-top: -10px;
+    margin-left: -100px;
+  }
+  /* Right shelf stacks IV (top) and V (bottom) on desktop, mirroring I & II on
+     the left — hide III here; it's floated above the turntable instead. */
+  .shelf-triple .vinyl-pick.album-3 {
+    display: none;
+  }
+  /* Album III floated just above the turntable, centred on it. Anchored to
+     .turntable-wrap (position:relative) so it tracks the player exactly, at the
+     same 227px size as the shelf picks. The `.vinyl-pick.above-turntable`
+     selector (3 classes) is needed so this transform outranks the base
+     `.vinyl-pick.album-3 { transform: rotate(-2.5deg) }` rule further down the
+     file — otherwise that ties on specificity and wins on source order, wiping
+     out the translateX. */
+  .turntable-wrap .vinyl-pick.above-turntable {
+    display: block;
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    width: 227px;
+    /* Centred on the turntable (-50%), nudged 10px right, and lifted 35px (25px
+       to cancel the player's extra drop + 10px more) for a gap above the player. */
+    transform: translate(calc(-50% + 10px), -35px) rotate(-2.5deg);
+    z-index: 5;
+  }
+  .turntable-wrap .vinyl-pick.above-turntable:hover {
+    transform: translate(calc(-50% + 10px), -43px) rotate(-2.5deg);
   }
   .side-link-right {
     transform: rotate(5deg);
@@ -444,6 +539,13 @@ body::before {
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.4),
     0 0 0 2px #000000;
+}
+/* Album III's sticker image is framed tighter than the others — zoom it
+   out a bit and fill the exposed edges with white, like a real label. */
+.record-label.alt-label {
+  background-size: 82%;
+  background-repeat: no-repeat;
+  background-color: #f5f0e6;
 }
 .record-label::after {
   content: '';
@@ -603,12 +705,14 @@ body::before {
 .vinyl-pick.album-2 { transform: rotate(3deg); }
 .vinyl-pick.album-3 { transform: rotate(-2.5deg); }
 .vinyl-pick.album-4 { transform: rotate(3.5deg); }
+.vinyl-pick.album-5 { transform: rotate(-3deg); }
 
 /* Hover: preserve tilt, add lift */
 .vinyl-pick.album-1:hover { transform: rotate(-4deg) translateY(-8px); }
 .vinyl-pick.album-2:hover { transform: rotate(3deg) translateY(-8px); }
 .vinyl-pick.album-3:hover { transform: rotate(-2.5deg) translateY(-8px); }
 .vinyl-pick.album-4:hover { transform: rotate(3.5deg) translateY(-8px); }
+.vinyl-pick.album-5:hover { transform: rotate(-3deg) translateY(-8px); }
 
 .vinyl-pick.selected {
   filter: grayscale(0.5) brightness(0.6);
@@ -699,6 +803,13 @@ body::before {
   left: 7px;
   transform: rotate(-1.5deg);
 }
+.vinyl-pick.album-5 .sleeve::after {
+  content: 'NEW';
+  background: #c9962e;
+  bottom: 9px;
+  right: 7px;
+  transform: rotate(-2deg);
+}
 
 /* --- Vinyl disc on top of sleeve --- */
 .vinyl-pick .vinyl-disc {
@@ -722,11 +833,14 @@ body::before {
     inset 0 0 20px rgba(0, 0, 0, 0.6);
   z-index: 3;
 }
-/* Per-album disc offsets — disc pushed to corner, cover center exposed */
-.vinyl-pick.album-1 .vinyl-disc { top: -34%; left: 32%;  width: 112%; }
-.vinyl-pick.album-2 .vinyl-disc { top: 34%;  left: -30%; width: 109%; }
-.vinyl-pick.album-3 .vinyl-disc { top: -28%; left: -20%; width: 111%; }
-.vinyl-pick.album-4 .vinyl-disc { top: 30%;  left: 24%;  width: 108%; }
+/* Per-album disc offsets — disc pushed to corner, cover center exposed. Each
+   record is also nudged slightly off the axis of its case's tilt so it doesn't
+   look glued to the sleeve (album 5's offset lives in the desktop cluster). */
+.vinyl-pick.album-1 .vinyl-disc { top: -34%; left: 32%;  width: 112%; transform: rotate(5deg); }
+.vinyl-pick.album-2 .vinyl-disc { top: 34%;  left: -30%; width: 109%; transform: rotate(-4deg); }
+.vinyl-pick.album-3 .vinyl-disc { top: -28%; left: -20%; width: 111%; transform: rotate(6deg); }
+.vinyl-pick.album-5 .vinyl-disc { top: 30%; left: -24%; width: 110%; }
+.vinyl-pick.album-4 .vinyl-disc { top: -38%; left: -30%; width: 108%; transform: rotate(-5deg); }
 .vinyl-pick .vinyl-disc::before {
   content: '';
   position: absolute;
@@ -768,6 +882,13 @@ body::before {
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.4),
     0 0 0 2px #000000;
+}
+/* Album III's sticker image is framed tighter than the others — zoom it
+   out a bit and fill the exposed edges with white, like a real label. */
+.vinyl-pick.album-3 .label {
+  background-size: 82%;
+  background-repeat: no-repeat;
+  background-color: #f5f0e6;
 }
 .vinyl-pick .label::after {
   content: '';
@@ -1102,6 +1223,15 @@ footer {
     gap: 56px;
     transform: none;
   }
+  /* Swap the two nav buttons on mobile: Upcoming Gigs (in the cluster) moves to
+     the top and Ramblings to the bottom — the reverse of their DOM order — while
+     the albums and turntable stay in the middle. */
+  .player-scene .side-link-cluster {
+    order: -1;
+  }
+  .player-scene .side-link-left {
+    order: 1;
+  }
   .turntable-wrap {
     width: min(345px, 65vw);
     transform: translate(-12px, 24px);
@@ -1133,6 +1263,36 @@ footer {
   .vinyl-pick.album-3 {
     top: 22px;
   }
+  /* Mobile-only disc repositioning (desktop keeps its own tuned offsets) */
+  .vinyl-pick.album-1 .vinyl-disc {
+    left: -32%;
+  }
+  .vinyl-pick.album-4 .vinyl-disc {
+    top: -15%;
+    left: -14%;
+  }
+  /* Right shelf now holds 3 discs — keep them on one row, same size as
+     the top shelf's discs, overlap and all. flex-shrink:0 stops the browser
+     from shrinking them to fit; they overlap instead. */
+  .shelf.shelf-triple {
+    flex-wrap: nowrap;
+  }
+  /* IV overlaps III where they're squeezed together — keep III on top. */
+  .shelf.shelf-triple .vinyl-pick.album-3 {
+    z-index: 2;
+  }
+  .shelf.shelf-triple .vinyl-pick.album-4 {
+    z-index: 1;
+  }
+  .shelf.shelf-triple .vinyl-pick {
+    flex-shrink: 0;
+  }
+  .shelf.shelf-triple .vinyl-pick.album-3 {
+    margin-right: -20px;
+  }
+  .shelf.shelf-triple .vinyl-pick.album-5 {
+    margin-left: -20px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1157,16 +1317,33 @@ footer {
     transform: translateY(4vh);
   }
   .turntable-wrap {
-    transform: translateY(40px);
+    /* 40px base + 30px + 25px lower. Transform-only, so nothing else shifts.
+       Album III is a child so it would ride down too — it lifts itself back up
+       by the same 25px (below) so a gap opens between it and the player. */
+    transform: translateY(95px);
   }
   .album-sidebar {
     transform: translateY(24px);
   }
   .now-playing {
-    margin: 10px auto 0;
+    margin: 0 auto;
+    padding: 8px 18px;
+  }
+  .now-playing-label {
+    margin-bottom: 4px;
   }
   footer {
-    margin-top: 10px;
+    margin-top: 0;
+  }
+  .inquiries {
+    margin-bottom: 8px;
+  }
+  .social-btn {
+    width: 48px;
+    height: 48px;
+  }
+  .copyright {
+    margin-top: 8px;
   }
 }
 
@@ -1189,9 +1366,23 @@ footer {
     max-width: 205px;
   }
   .now-playing {
-    margin-top: 6px;
+    margin-top: 0;
+    padding: 4px 18px;
+  }
+  .now-playing-label {
+    margin-bottom: 2px;
   }
   footer {
-    margin-top: 6px;
+    margin-top: 0;
+  }
+  .inquiries {
+    margin-bottom: 4px;
+  }
+  .social-btn {
+    width: 40px;
+    height: 40px;
+  }
+  .copyright {
+    margin-top: 4px;
   }
 }

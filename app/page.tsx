@@ -61,7 +61,7 @@ export default function Home() {
             rel="noopener noreferrer"
             aria-label="Deezer"
           >
-            <img className="social-img" src="/covers/deezer.png" alt="Deezer" />
+            <img className="social-img" src="/covers/deezer.webp" alt="Deezer" />
           </a>
         </nav>
         <div className="copyright">
@@ -80,7 +80,16 @@ export default function Home() {
             © Dromiko Productions 2026. All rights reserved
           </span>
           <span className="copyright-right">
-            © Akos Digital 2026. All rights reserved
+            ©{' '}
+            <a
+              className="inquiries-link"
+              href="https://akosds.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Akos Digital
+            </a>{' '}
+            2026. All rights reserved
           </span>
         </div>
       </footer>
