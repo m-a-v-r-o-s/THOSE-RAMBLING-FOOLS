@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useRef } from 'react';
 import { ALBUMS, type Album } from '../albums';
@@ -73,8 +74,20 @@ export default function Turntable() {
       <div className="player-scene">
 
         <Link href="/our-story" className="side-link side-link-left">
-          <img src="/covers/ramblings2.webp" className="side-link-img" alt="Ramblings" />
-          <img src="/covers/ramblings2mob.webp" className="side-link-img-mobile" alt="Ramblings" />
+          <Image
+            src="/covers/ramblings2.webp"
+            className="side-link-img"
+            alt="Ramblings"
+            width={1492}
+            height={1054}
+          />
+          <Image
+            src="/covers/ramblings2mob.webp"
+            className="side-link-img-mobile"
+            alt="Ramblings"
+            width={2072}
+            height={759}
+          />
           <span className="side-link-text">Ramblings</span>
         </Link>
 
@@ -111,7 +124,7 @@ export default function Turntable() {
             </div>
 
             <div className={`tonearm${isTonearmDown ? ' playing' : ''}`}>
-              <img src="/covers/arm.webp" alt="" />
+              <Image src="/covers/arm.webp" alt="" width={1024} height={683} priority />
             </div>
 
             <button
@@ -168,8 +181,20 @@ export default function Turntable() {
         <div className="side-link-cluster">
           {renderPick(albumThree, 'cluster-pick')}
           <Link href="/upcoming-gigs" className="side-link side-link-right">
-            <img src="/covers/gigs.webp" className="side-link-img" alt="Upcoming Gigs" />
-            <img src="/covers/buttonhor.webp" className="side-link-img-mobile" alt="Upcoming Gigs" />
+            <Image
+              src="/covers/gigs.webp"
+              className="side-link-img"
+              alt="Upcoming Gigs"
+              width={716}
+              height={1054}
+            />
+            <Image
+              src="/covers/buttonhor.webp"
+              className="side-link-img-mobile"
+              alt="Upcoming Gigs"
+              width={1504}
+              height={499}
+            />
             <span className="side-link-text">Upcoming Gigs</span>
           </Link>
           {renderPick(albumFive, 'cluster-pick')}

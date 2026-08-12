@@ -51,6 +51,7 @@ export default function AdminLoginPage() {
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="username"
               autoFocus
+              required
               enterKeyHint="next"
             />
           </div>
@@ -62,6 +63,7 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
+              required
               enterKeyHint="go"
             />
           </div>

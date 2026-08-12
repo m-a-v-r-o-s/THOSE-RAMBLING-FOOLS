@@ -387,7 +387,7 @@ export default function AdminPage() {
         <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} onFocus={handleFocus}>
           <div className={styles.field}>
             <label htmlFor="name">Venue / name *</label>
-            <input id="name" value={form.name} onChange={setField('name')} placeholder="Venue or bar name" enterKeyHint="next" />
+            <input id="name" value={form.name} onChange={setField('name')} placeholder="Venue or bar name" required enterKeyHint="next" />
           </div>
           <div className={styles.field}>
             <label htmlFor="location">Location</label>
@@ -434,6 +434,7 @@ export default function AdminPage() {
                 type="date"
                 value={form.onceDate}
                 onChange={(e) => setForm((f) => ({ ...f, onceDate: e.target.value }))}
+                required
               />
             </div>
           )}
@@ -540,6 +541,7 @@ export default function AdminPage() {
               value={postForm.title}
               onChange={(e) => setPostForm((s) => ({ ...s, title: e.target.value }))}
               placeholder="Post title"
+              required
             />
           </div>
           <div className={styles.field}>

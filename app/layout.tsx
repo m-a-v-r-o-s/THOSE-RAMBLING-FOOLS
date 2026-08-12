@@ -1,11 +1,24 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import AudioProvider from './components/AudioProvider';
+import CookieBanner from './components/CookieBanner';
+import { SITE_NAME, SITE_URL } from '@/lib/site';
+
+const DESCRIPTION = 'Discography & turntable for the band Those Rambling Fools.';
 
 export const metadata: Metadata = {
-  title: 'Those Rambling Fools',
-  description: 'Discography & turntable for the band Those Rambling Fools.',
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+  description: DESCRIPTION,
   icons: { icon: '/covers/favicon.ico' },
+  openGraph: {
+    title: SITE_NAME,
+    description: DESCRIPTION,
+    url: '/',
+    siteName: SITE_NAME,
+    type: 'website',
+    images: ['/covers/finafinallbg.webp'],
+  },
 };
 
 export default function RootLayout({
@@ -44,6 +57,7 @@ export default function RootLayout({
       </head>
       <body data-theme="default">
         <AudioProvider>{children}</AudioProvider>
+        <CookieBanner />
       </body>
     </html>
   );

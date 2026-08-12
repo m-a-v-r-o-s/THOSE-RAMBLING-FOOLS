@@ -1,3 +1,5 @@
+import Image from 'next/image';
+import Link from 'next/link';
 import Masthead from './components/Masthead';
 import Turntable from './components/Turntable';
 
@@ -61,9 +63,24 @@ export default function Home() {
             rel="noopener noreferrer"
             aria-label="Deezer"
           >
-            <img className="social-img" src="/covers/deezer.webp" alt="Deezer" />
+            <Image
+              className="social-img"
+              src="/covers/deezer.webp"
+              alt="Deezer"
+              width={328}
+              height={311}
+            />
           </a>
         </nav>
+        <p className="legal-links">
+          <Link href="/privacy" className="inquiries-link">
+            Privacy Policy
+          </Link>{' '}
+          &middot;{' '}
+          <Link href="/terms" className="inquiries-link">
+            Terms of Service
+          </Link>
+        </p>
         <div className="copyright">
           <span className="copyright-center">
             Additional design elements by{' '}

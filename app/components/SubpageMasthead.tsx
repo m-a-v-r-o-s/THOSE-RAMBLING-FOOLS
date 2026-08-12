@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
@@ -26,10 +27,13 @@ export default function SubpageMasthead() {
       <div ref={sentinelRef} className="masthead-sentinel" aria-hidden="true" />
       <header className={`masthead${stuck ? ' stuck' : ''}`}>
         <Link href="/" aria-label="Back to home">
-          <img
+          <Image
             className="logo"
             src="/covers/newlogo.webp"
             alt="Those Rambling Fools"
+            width={1290}
+            height={199}
+            priority
           />
         </Link>
       </header>

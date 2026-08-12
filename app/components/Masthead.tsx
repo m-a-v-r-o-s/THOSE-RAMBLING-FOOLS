@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Masthead() {
@@ -21,11 +22,13 @@ export default function Masthead() {
     <>
       <div ref={sentinelRef} className="masthead-sentinel" aria-hidden="true" />
       <header className={`masthead${stuck ? ' stuck' : ''}`}>
-        <img
+        <Image
           className="logo"
           src="/covers/newlogo.webp"
           alt="Those Rambling Fools"
-          fetchPriority="high"
+          width={1290}
+          height={199}
+          priority
         />
       </header>
     </>
