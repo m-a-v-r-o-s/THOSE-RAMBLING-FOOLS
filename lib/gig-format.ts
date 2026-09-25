@@ -75,8 +75,16 @@ export function formatWhen(gig: Gig): string {
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+// Upper bounds on what the admin can store. Generous for real use, small
+// enough that a bad request can't bloat the JSON file on the volume.
+const MAX_LEN = { name: 120, location: 200, mapUrl: 500, time: 60 };
+const MAX_DATES = 60;
+
+const str = (v: unknown): string => (typeof v === 'string' ? v.trim() : '');
+
 // Validates/normalises a raw request body into a GigInput.
-// Shared by the create (POST) and edit (PUT) routes.
+// Shared by the create (POST) and edit (PUT) routes. Only the fields below
+// are ever copied from the body (no mass assignment).
 export function parseGigInput(
   body: any
 ): { input: GigInput } | { error: string } {
@@ -92,11 +100,29 @@ export function parseGigInput(
     ? body.dates.filter((d: unknown): d is string => typeof d === 'string' && DATE_RE.test(d))
     : [];
 
+  const name = str(body.name);
+  const location = str(body.location);
+  const mapUrl = str(body.mapUrl);
+  const time = str(body.time);
+
+  for (const [field, value] of Object.entries({ name, location, mapUrl, time })) {
+    if (value.length > MAX_LEN[field as keyof typeof MAX_LEN]) {
+      return { error: `The ${field} is too long.` };
+    }
+  }
+  // Rendered as a link on the public page, so only real web URLs.
+  if (mapUrl && !/^https?:\/\//i.test(mapUrl)) {
+    return { error: 'The map link must start with https://' };
+  }
+  if (validDates.length > MAX_DATES) {
+    return { error: `At most ${MAX_DATES} dates per gig.` };
+  }
+
   const input: GigInput = {
-    name: String(body.name).trim(),
-    location: String(body.location ?? '').trim(),
-    mapUrl: body.mapUrl ? String(body.mapUrl).trim() : undefined,
-    time: body.time ? String(body.time).trim() : undefined,
+    name,
+    location,
+    mapUrl: mapUrl || undefined,
+    time: time || undefined,
     frequency,
   };
 

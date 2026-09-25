@@ -61,17 +61,24 @@ async function savePosts(posts: Post[]): Promise<void> {
   await fs.rename(tmp, DATA_FILE);
 }
 
+const MAX_TITLE = 200;
+const MAX_BODY = 50_000;
+const MAX_SIGNATURE = 200;
+
+// Only title/body/signature are ever copied from the request (no mass assignment).
 export function parsePostInput(body: any): { input: PostInput } | { error: string } {
   if (!body || typeof body.title !== 'string' || !body.title.trim()) {
     return { error: 'A title is required.' };
   }
-  return {
-    input: {
-      title: String(body.title).trim(),
-      body: typeof body.body === 'string' ? body.body : '',
-      signature: typeof body.signature === 'string' ? body.signature.trim() : '',
-    },
+  const input: PostInput = {
+    title: String(body.title).trim(),
+    body: typeof body.body === 'string' ? body.body : '',
+    signature: typeof body.signature === 'string' ? body.signature.trim() : '',
   };
+  if (input.title.length > MAX_TITLE) return { error: 'The title is too long.' };
+  if (input.body.length > MAX_BODY) return { error: 'The text is too long.' };
+  if (input.signature.length > MAX_SIGNATURE) return { error: 'The signature is too long.' };
+  return { input };
 }
 
 // New posts default to the top of the list ("newest on top"); the admin can
