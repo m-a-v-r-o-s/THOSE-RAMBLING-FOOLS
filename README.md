@@ -1,74 +1,48 @@
-# Those Rambling Fools — Band Site
+# Those Rambling Fools: Band Site
 
+Astro site with a Node server (`@astrojs/node`, standalone), hosted on Railway.
 
 ## Running locally
 
-You need **Node.js 18.18+** installed.
+Node 22.12+.
 
 ```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:3001
 ```
 
-Then open [http://localhost:3000](http://localhost:3000).
-
-## Build for production
+## Production build
 
 ```bash
 npm run build
-npm start
+npm start          # node server.mjs, listens on 0.0.0.0:$PORT (default 8080)
 ```
 
-## Project structure
+## Structure
 
 ```
-those-rambling-fools-next/
-├── app/
-│   ├── components/
-│   │   └── Turntable.tsx     ← interactive client component
-│   ├── albums.ts             ← album data (covers, Spotify IDs)
-│   ├── globals.css           ← theme system + all styling
-│   ├── layout.tsx            ← root layout + Google Fonts
-│   └── page.tsx              ← home page (server component)
-├── public/
-│   └── covers/               ← album cover images
-├── package.json
-├── tsconfig.json
-└── next.config.mjs
+src/
+  pages/            routes; our-story, upcoming-gigs and /admin render on demand,
+                    everything else is prerendered at build time
+  layouts/Base.astro  head metadata, JSON-LD, view-transition router, cookie banner
+  components/       React islands (Turntable, AudioProvider store, StoryView,
+                    mastheads, CookieBanner, admin editor + login)
+  middleware.ts     /admin session guard
+  styles/globals.css
+  albums.ts         discography (turntable + JSON-LD)
+lib/                data layer: gigs.json / posts.json in GIGS_DATA_DIR (Railway volume)
+server.mjs          production entry: apex->www redirect, security and cache headers
+public/covers/      art and album audio
 ```
 
-## How it works
+Audio keeps playing across pages because navigation goes through Astro's
+`<ClientRouter />` (no full reload) and the player state lives at module scope
+in `src/components/AudioProvider.tsx`.
 
-- `app/page.tsx` is a **server component** — it renders the static masthead/footer on the server with zero JS sent to the browser for that part.
-- `app/components/Turntable.tsx` is a **client component** (`'use client'` directive) because it uses `useState`, `useRef`, and event handlers for the interactive turntable.
-- `app/albums.ts` is the single source of truth for the discography. Add a new release by appending an entry there.
-- The theme system uses CSS variables on `[data-theme="..."]` selectors. Clicking a vinyl sets `data-theme` on `<body>`, and all colors transition smoothly via CSS `transition`.
+## Adding an album
 
-## Adding a new album
+Append an entry to `src/albums.ts`, drop the art and mp3 into `public/covers/`
+under a new filename (covers are cached as immutable), and optionally add an
+`[data-theme="album-N"]` block in `src/styles/globals.css`.
 
-Edit `app/albums.ts`:
-
-```ts
-{
-  key: 'album-5',  // must be unique
-  name: 'V',
-  title: 'New Album Name',
-  cover: '/covers/album5.png',
-  spotifyId: 'YOUR_SPOTIFY_ALBUM_ID',
-}
-```
-
-Then drop `album5.png` into `public/covers/` and optionally add an `[data-theme="album-5"]` block in `globals.css` with custom colors. If you don't, it'll just use the default theme.
-
-## Spotify embed notes
-
-- The `/embed/album/...` iframe gives **30-second previews** to logged-out users and **full songs** to anyone logged into Spotify in the same browser.
-- The play/pause/eject controls on the turntable are *visual* — Spotify's free embed doesn't expose play-state events to the page. Spotify's own play button inside the iframe controls actual audio playback.
-
-## Deploying
-
-The fastest path is [Vercel](https://vercel.com) (made by the Next.js team):
-
-1. Push this folder to a GitHub repo
-2. Import it on Vercel
-3. It'll build and deploy automatically — no config needed
+See `DEPLOY.md` for Railway notes.
