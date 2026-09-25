@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import SubpageMasthead from '../components/SubpageMasthead';
+import { getGigs } from '@/lib/gigs';
+import { formatWhen } from '@/lib/gig-format';
+
+// Always read the latest gigs at request time.
+export const prerender = false;
+
+const gigs = await getGigs();
+---
+
+<Base
+  title="Upcoming Gigs"
+  description="See where Those Rambling Fools are playing next — live gig dates, times and locations in Kos, Greece."
+  og={{
+    title: 'Upcoming Gigs | Those Rambling Fools',
+    description: 'See where Those Rambling Fools are playing next.',
+    image: '/covers/gigs.webp',
+  }}
+>
+  <div class="stage subpage">
+    <SubpageMasthead client:load />
+
+    <main class="subpage-content">
+      <h1 class="subpage-title">Upcoming Gigs</h1>
+
+      {
+        gigs.length === 0 ? (
+          <p class="gig-details">No gigs scheduled right now — check back soon.</p>
+        ) : (
+          gigs.map((gig) => (
+            <div class="gig-entry">
+              <p class="gig-name">{gig.name}</p>
+              <p class="gig-details">{[gig.location, formatWhen(gig)].filter(Boolean).join(' — ')}</p>
+              {gig.mapUrl && (
+                <a class="gig-map-link" href={gig.mapUrl} target="_blank" rel="noopener noreferrer">
+                  View on Google Maps
+                </a>
+              )}
+            </div>
+          ))
+        )
+      }
+
+      <div class="subpage-links">
+        <a href="/" class="side-link">Back</a>
+        <a href="/our-story" class="side-link">Our Story</a>
+      </div>
+    </main>
+  </div>
+</Base>

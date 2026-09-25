@@ -1,0 +1,106 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import CookieBanner from '../components/CookieBanner';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
+import { ALBUMS } from '../albums';
+import '../styles/globals.css';
+
+interface Props {
+  // Page title, rendered as "<title> | Those Rambling Fools". Omit for the home page.
+  title?: string;
+  description?: string;
+  // Open Graph / Twitter card. Omitted fields fall back to the site defaults.
+  og?: { title?: string; description?: string; image?: string };
+  noindex?: boolean;
+  canonical?: boolean;
+  admin?: boolean;
+}
+
+const {
+  title,
+  description = SITE_DESCRIPTION,
+  og = {},
+  noindex = false,
+  canonical = true,
+  admin = false,
+} = Astro.props;
+
+const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME}: Original Music from Kos, Greece`;
+// Same shape Next emitted: no trailing slash on the home URL.
+const pageUrl = `${SITE_URL}${Astro.url.pathname === '/' ? '' : Astro.url.pathname}`;
+const ogUrl = og.title ? pageUrl : SITE_URL;
+const ogTitle = og.title ?? SITE_NAME;
+const ogDescription = og.description ?? SITE_DESCRIPTION;
+const ogImage = `${SITE_URL}${og.image ?? '/covers/finafinallbg.webp'}`;
+
+// Band entity schema. Members and origin come from data/story.json and the gig
+// listings, the profile links from the homepage footer, the discography from
+// the same ALBUMS array the turntable renders.
+const BAND_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicGroup',
+  '@id': `${SITE_URL}/#band`,
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
+  image: `${SITE_URL}/covers/finafinallbg.webp`,
+  logo: `${SITE_URL}/covers/newlogo.webp`,
+  genre: 'Rock',
+  foundingLocation: { '@type': 'Place', name: 'Kos, Greece' },
+  areaServed: { '@type': 'Place', name: 'Kos, Greece' },
+  member: [
+    { '@type': 'Person', name: 'Christos P.' },
+    { '@type': 'Person', name: 'Ioannis' },
+  ],
+  album: ALBUMS.map((a) => ({
+    '@type': 'MusicAlbum',
+    name: a.title,
+    image: `${SITE_URL}${a.cover}`,
+    byArtist: { '@id': `${SITE_URL}/#band` },
+  })),
+  sameAs: [
+    'https://open.spotify.com/artist/04c4MB7bgg1DwEV7kLLJvf',
+    'https://www.youtube.com/@ThoseRamblingFools',
+    'https://www.instagram.com/thoseramblingfoolsofficial/',
+    'https://www.deezer.com/en/artist/334497151',
+  ],
+};
+---
+
+<html lang="en" transition:animate="none">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Abel&display=swap" rel="stylesheet" />
+    {/* Preload critical above-the-fold images */}
+    <link rel="preload" as="image" href="/covers/newlogo.webp" />
+    <link rel="preload" as="image" href="/covers/playeronlynew.webp" />
+    <link rel="preload" as="image" href="/covers/finalfinalmob.webp" media="(max-width: 859px)" />
+    <link rel="preload" as="image" href="/covers/finafinallbg.webp" media="(min-width: 860px)" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {canonical && <link rel="canonical" href={pageUrl} />}
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:url" content={ogUrl} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={ogDescription} />
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="icon" href="/covers/favicon.ico" />
+    {/* Page swaps without a reload, so the album keeps playing across pages
+        (see components/AudioProvider.tsx). No animation, same as the old site. */}
+    <ClientRouter fallback="swap" />
+  </head>
+  <body data-theme="default">
+    <script type="application/ld+json" set:html={JSON.stringify(BAND_SCHEMA)} />
+    <slot />
+    {!admin && <CookieBanner client:idle />}
+  </body>
+</html>

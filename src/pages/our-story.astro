@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import StoryView from '../components/StoryView';
+import SubpageMasthead from '../components/SubpageMasthead';
+import { getPosts } from '@/lib/posts';
+
+// Always read the latest posts at request time.
+export const prerender = false;
+
+const posts = await getPosts();
+---
+
+<Base
+  title="Our Story"
+  description="The story behind Those Rambling Fools, in the band's own words — how the music got made and what keeps it going."
+  og={{
+    title: 'Our Story | Those Rambling Fools',
+    description: "The story behind Those Rambling Fools, in the band's own words.",
+    image: '/covers/ourstory.webp',
+  }}
+>
+  <div class="stage subpage">
+    <SubpageMasthead client:load />
+
+    <main class="subpage-content">
+      {/* A single post has no tabs, so it needs no JS at all. */}
+      {posts.length > 1 ? <StoryView client:load posts={posts} /> : <StoryView posts={posts} />}
+      <div class="subpage-links">
+        <a href="/" class="side-link">Back</a>
+        <a href="/upcoming-gigs" class="side-link">Upcoming Gigs</a>
+      </div>
+    </main>
+  </div>
+</Base>

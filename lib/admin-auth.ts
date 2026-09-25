@@ -1,5 +1,5 @@
 // Shared admin-session helpers. No Node-only APIs (uses Web Crypto) so this can
-// be imported from both the Edge middleware (proxy.ts) and Node route handlers.
+// be imported from both the middleware (src/middleware.ts) and the API routes.
 
 export const SESSION_COOKIE = 'trf_admin';
 

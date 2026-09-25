@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import AdminLogin from '../../components/admin/AdminLogin';
+
+export const prerender = false;
+---
+
+<Base title="Admin" noindex admin>
+  <AdminLogin client:load />
+</Base>

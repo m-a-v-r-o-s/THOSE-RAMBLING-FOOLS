@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import SubpageMasthead from '../components/SubpageMasthead';
+---
+
+<Base
+  title="Wrong Groove"
+  description="This page doesn't exist. Head back to the Those Rambling Fools turntable."
+  noindex
+  canonical={false}
+>
+  <div class="stage subpage">
+    <SubpageMasthead client:load />
+
+    <main class="subpage-content">
+      <h1 class="subpage-title">Wrong Groove</h1>
+      <p>
+        This track isn&apos;t on the record. The page you&apos;re looking for has wandered off
+        somewhere, same as the rest of us.
+      </p>
+      <a href="/" class="side-link">Back to the turntable</a>
+    </main>
+  </div>
+</Base>

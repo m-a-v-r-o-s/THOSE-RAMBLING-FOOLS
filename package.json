@@ -1,23 +1,26 @@
 {
   "name": "those-rambling-fools",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "astro dev --port 3001",
+    "build": "astro build",
+    "start": "node server.mjs",
+    "preview": "astro preview --port 3001"
   },
   "dependencies": {
-    "eslint-config-next": "^16.2.6",
-    "next": "^16.2.6",
+    "@astrojs/node": "^11.1.6",
+    "@astrojs/react": "^7.0.0",
+    "astro": "^7.3.5",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
   "devDependencies": {
-    "@types/node": "^22",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "typescript": "^5"
+    "@types/react": "^19",
+    "@types/react-dom": "^19"
   }
 }

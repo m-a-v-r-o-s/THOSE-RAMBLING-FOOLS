@@ -1,10 +1,8 @@
 /node_modules
-/.next/
-/out/
-/build
+/dist/
+/.astro/
 .DS_Store
 .env*.local
-.vercel
 
 # Local gig store (JSON file written at runtime)
 /data

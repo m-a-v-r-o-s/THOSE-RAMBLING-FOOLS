@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import AdminEditor from '../../components/admin/AdminEditor';
+
+export const prerender = false;
+---
+
+<Base title="Admin" noindex admin>
+  <AdminEditor client:load />
+</Base>
