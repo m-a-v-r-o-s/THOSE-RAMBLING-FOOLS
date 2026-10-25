@@ -1,7 +1,12 @@
 import type { APIRoute } from 'astro';
-import { SESSION_COOKIE, getAdminCredentials, sessionToken } from '@/lib/admin-auth';
+import {
+  SESSION_COOKIE, SESSION_MAX_AGE_S, clientIp, createSession, getAdminCredentials,
+  loginWait, recordLoginFailure, recordLoginSuccess, safeEqual,
+} from '@/lib/admin-auth';
 
 export const prerender = false;
+
+const DENIED = 'Wrong username or password.';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const creds = getAdminCredentials();
@@ -10,20 +15,33 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   const body = await request.json().catch(() => null);
-  const given = {
-    username: typeof body?.username === 'string' ? body.username.trim() : '',
-    password: typeof body?.password === 'string' ? body.password.trim() : '',
-  };
-  if (given.username !== creds.user || given.password !== creds.pass) {
-    return Response.json({ error: 'Wrong username or password.' }, { status: 401 });
+  const username = typeof body?.username === 'string' ? body.username.trim() : '';
+  const password = typeof body?.password === 'string' ? body.password.trim() : '';
+  const ip = clientIp(request);
+
+  const wait = loginWait(username, ip);
+  if (wait > 0) {
+    return Response.json({ error: DENIED }, {
+      status: 429,
+      headers: { 'Retry-After': String(Math.ceil(wait / 1000)) },
+    });
   }
 
-  cookies.set(SESSION_COOKIE, await sessionToken(creds.user, creds.pass), {
+  // Both compares always run (no short circuit) so timing reveals nothing.
+  const okUser = safeEqual(username, creds.user);
+  const okPass = safeEqual(password, creds.pass);
+  if (!(okUser && okPass)) {
+    recordLoginFailure(username, ip);
+    return Response.json({ error: DENIED }, { status: 401 });
+  }
+
+  recordLoginSuccess(username, ip);
+  cookies.set(SESSION_COOKIE, createSession(), {
     httpOnly: true,
     secure: !import.meta.env.DEV,
     sameSite: 'lax',
     path: '/admin',
-    maxAge: 60 * 60 * 24 * 30, // 30 days
+    maxAge: SESSION_MAX_AGE_S,
   });
   return Response.json({ ok: true });
 };

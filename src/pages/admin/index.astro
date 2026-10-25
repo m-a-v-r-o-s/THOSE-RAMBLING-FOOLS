@@ -1,8 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { isAdmin } from '@/lib/admin-auth';
 import AdminEditor from '../../components/admin/AdminEditor';
 
 export const prerender = false;
+
+// Defense in depth: the middleware already guards this page.
+if (!isAdmin(Astro.cookies)) return Astro.redirect('/admin/login', 307);
 ---
 
 <Base title="Admin" noindex admin>

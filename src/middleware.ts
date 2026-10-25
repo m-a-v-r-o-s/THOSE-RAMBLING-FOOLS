@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware';
-import { SESSION_COOKIE, getAdminCredentials, sessionToken } from '@/lib/admin-auth';
+import { getAdminCredentials, isAdmin } from '@/lib/admin-auth';
 
 // Guards everything under /admin with a cookie session (set by /admin/login).
 // Set ADMIN_USER and ADMIN_PASSWORD in the environment (Railway variables).
@@ -44,10 +44,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
     return new Response('Admin is not configured.', { status: 503 });
   }
 
-  const cookie = ctx.cookies.get(SESSION_COOKIE)?.value;
-  if (cookie && cookie === (await sessionToken(creds.user, creds.pass))) {
-    return next();
-  }
+  if (isAdmin(ctx.cookies)) return next();
 
   // Not signed in: APIs get a clean 401 (so fetch() can handle it), page
   // requests are redirected to the styled login page.

@@ -1,9 +1,12 @@
 import type { APIRoute } from 'astro';
+import { requireAdmin } from '@/lib/admin-auth';
 import { updatePost, deletePost, parsePostInput } from '@/lib/posts';
 
 export const prerender = false;
 
-export const PUT: APIRoute = async ({ params, request }) => {
+export const PUT: APIRoute = async ({ params, request, cookies }) => {
+  const denied = requireAdmin(cookies);
+  if (denied) return denied;
   const body = await request.json().catch(() => null);
   const parsed = parsePostInput(body);
   if ('error' in parsed) {
@@ -16,7 +19,9 @@ export const PUT: APIRoute = async ({ params, request }) => {
   return Response.json(post);
 };
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const DELETE: APIRoute = async ({ params, cookies }) => {
+  const denied = requireAdmin(cookies);
+  if (denied) return denied;
   const result = await deletePost(params.id!);
   if (!result.ok) {
     const status = result.error === 'Post not found.' ? 404 : 400;
