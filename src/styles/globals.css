@@ -369,6 +369,18 @@ a {
   inset: 0;
   border-radius: 50%;
 }
+/* Cut from the deck photo at the platter centre (24px square), so it matches exactly. */
+.spindle {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 2.94%;
+  height: 2.94%;
+  border-radius: 50%;
+  background: url('data:image/webp;base64,UklGRqICAABXRUJQVlA4IJYCAACQDACdASowADAAPjEWh0KiIQuOAswQAYJaQAThjolfHsn8jX+zflRyU7TP9g32Qb6Zp5q/pTzsjy+hEg18Ow+146Y9Ti+hu1vW29DRGYDVK3BK4Te4tRRfJHgwdspJbEBwTHuyo9Pjmj3ZGAAAAP7//q/qPEU3SNPif9X/8h+IGQXZ9LY9i72j4xU8FHLHA7zWg9C/zI5bbieXVTrO2vgUZM4HVk8//lLFRvKfFn/rxHl5M3zMObAE8mktmJtfOvvB+PEU/jwliLenoH6EvxV32uXfUGtPQXV3EviKz6vwQBTcIuSqDz1ojQk/mTFiD/A4TQBq2SY/K5mL7I+s+YbYQx3A9srFZQ5hi19fEaZi543ExcUvZmPyTeyHK1cfjOX02/IkbgaE3MozaEqPq+H+xEfMiJdB3o9cSEBCjXZeXok/6A1tgJBofdQO4St6QQvBqfhwpTlODsNz+Xb0fWifB7SjkJZcvQgc53V0YcGyKAmrncVmS/cGWrthrdhUm3DBDFi+GpD6BdHwyg8NnWCu9PP//MZYpfjPN8RoZ3N97fYTryCXzV902uXGryCxJ7ChzSzd7aphDgMrHsvW/+dcidsd7754nAalMAYUi9e3OreT6P9w7+gi6VrYIxPv1h2lQG2/I4aCtg+34EvbbffjHvUHDm4ikafTxC1aA0zrIFd8JlA16Fvpng9AC5nNKQsxf6QjWAf3Ae1qEOCgASVzPu6j7oBPt1SNit8CQR0Sm4vsMP0y9PKCgqBWYbJ9Y+mXuV/7zhGd2t/frYv9iMxPzan8IPXR1qZtfhg8QciOzTJQZtHDTA6OkRMt6t/MZ+PjCnwdfyX7Ts2/v+hwYi2B2elxJfIrNoFlJrk4H1niQSXYwAAAAA==') center / cover;
+  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.75);
+  pointer-events: none;
+}
 .disc {
   position: absolute;
   inset: 0;
@@ -699,11 +711,14 @@ a {
     translate: 0 -3px;
   }
 }
+.frame-single {
+  justify-items: center;
+  text-align: center;
+}
 .frame-single img {
   width: 64px;
   height: 64px;
   margin-top: 24px;
-  border-radius: 50%;
 }
 .frame-single span {
   font-family: var(--mule);

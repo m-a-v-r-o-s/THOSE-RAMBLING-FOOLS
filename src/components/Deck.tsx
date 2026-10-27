@@ -133,6 +133,8 @@ export default function Deck() {
         <div className="spin" ref={spinRef}>
           {current && <RecordDisc key={current.key} record={current} />}
         </div>
+        {/* The photo's own spindle, laid back over the record so it pokes through the hole. */}
+        <div className="spindle" />
       </div>
       <Tonearm deg={armDeg} follow={phase === 'playing'} />
       <button
