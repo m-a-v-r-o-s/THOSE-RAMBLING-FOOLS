@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import SubpageMasthead from '../components/SubpageMasthead';
+import TopBar from '../components/TopBar';
 ---
 
 <Base
@@ -9,7 +9,7 @@ import SubpageMasthead from '../components/SubpageMasthead';
   og={{ title: 'Terms of Service | Those Rambling Fools', description: 'The terms that apply to using the Those Rambling Fools website.' }}
 >
   <div class="stage subpage">
-    <SubpageMasthead client:load />
+    <TopBar client:load />
 
     <main class="subpage-content">
       <h1 class="subpage-title">Terms of Service</h1>

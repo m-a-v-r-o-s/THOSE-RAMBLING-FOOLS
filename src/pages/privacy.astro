@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import SubpageMasthead from '../components/SubpageMasthead';
+import TopBar from '../components/TopBar';
 ---
 
 <Base
@@ -9,7 +9,7 @@ import SubpageMasthead from '../components/SubpageMasthead';
   og={{ title: 'Privacy Policy | Those Rambling Fools', description: 'How Those Rambling Fools collects, uses and protects visitor data on this site.' }}
 >
   <div class="stage subpage">
-    <SubpageMasthead client:load />
+    <TopBar client:load />
 
     <main class="subpage-content">
       <h1 class="subpage-title">Privacy Policy</h1>
@@ -43,7 +43,8 @@ import SubpageMasthead from '../components/SubpageMasthead';
 
         <h2>Cookies</h2>
         <p>
-          We use a single functional flag to remember your cookie preference. If you accept
+          We use two functional flags: one remembers your cookie preference, the other skips the
+          opening title once you have seen it and is cleared when you close the tab. If you accept
           analytics, an additional analytics cookie may be set to measure aggregate, anonymous
           traffic (e.g. which pages are visited). You can withdraw consent at any time by
           clearing your browser&apos;s local storage/cookies for this site.

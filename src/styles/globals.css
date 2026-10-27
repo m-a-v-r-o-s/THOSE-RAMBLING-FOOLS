@@ -1,18 +1,29 @@
-/* ------- THEME ------- */
+/* Picture House: one dark room. The deck sits in a single light between two
+   letterbox bars; the bottom bar holds the records as a strip of film frames. */
 :root {
-  --bg-1: #1a2540;
-  --bg-2: #0a1230;
-  --bg-3: #02050f;
-  --paper: #2a3a55;
-  --ink: #f0e6c0;
-  --ink-soft: #b8a878;
-  --accent: #e8c050;
-  --vinyl: #0d0a08;
-  --vinyl-shine: #1a1f2a;
-  --glow: rgba(240, 200, 90, 0.5);
-  --vignette: rgba(0, 0, 10, 0.7);
-  --scene-overlay: linear-gradient(transparent, transparent);
-  --noise-opacity: 0.18;
+  color-scheme: dark;
+  --room: #070605;
+  --rule: #2a2522;
+  --bone: #ece4d6;
+  --text: #d6cdbf;
+  --muted: #a39a8d;
+  --red: #e04a3a;
+  --ochre: #d78c42;
+  --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --body: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --mule: 'Josefin Sans', Futura, 'Century Gothic', sans-serif;
+  --bar-h: 56px;
+  --bottom-h: 178px;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Lets the room's colour fade from one sleeve to the next. */
+@property --tint {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fff3e0;
 }
 
 * {
@@ -23,317 +34,944 @@
 
 html,
 body {
-  min-height: 100vh;
-  min-height: 100svh;
   overflow-x: clip;
-  font-family: 'Abel', sans-serif;
-  color: var(--ink);
-  transition: color 1.2s ease;
+  background: var(--room);
+  color: var(--bone);
 }
 
 body {
-  background:
-    var(--scene-overlay),
-    url('/covers/finalfinalmob.webp') center center / cover no-repeat,
-    radial-gradient(
-      ellipse at 50% 110%,
-      var(--bg-3) 0%,
-      var(--bg-2) 35%,
-      var(--bg-1) 80%
-    );
-  transition: background 1.4s ease;
-  position: relative;
   min-height: 100vh;
   min-height: 100svh;
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.6;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 0%, #1b1613, transparent 70%),
+    var(--room);
 }
 
-@media (min-width: 860px) {
-  body {
-    background:
-      var(--scene-overlay),
-      url('/covers/finafinallbg.webp') center center / auto 140% no-repeat fixed,
-      #000;
-  }
-  /* Lock the page to the viewport — no scrolling, everything fixed */
-  html,
-  body {
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-  }
-  .stage {
-    height: 100vh;
-    height: 100dvh;
-    /* The home page is tuned to fit exactly, so this is a no-op in normal
-       conditions — but on a resolution where content would still overflow
-       and clip the footer/copyright, scroll instead of hiding it. */
-    overflow-y: auto;
-  }
-  /* Sub-pages (Our Story / Upcoming Gigs) can grow taller than the viewport
-     (e.g. a long Ramblings post) — scroll within the stage so content past
-     the fold, including the Back link, stays reachable. */
-  .stage.subpage {
-    overflow-y: auto;
-  }
-  /* Pin the logo to the top of that scroll so it stays visible as content
-     scrolls behind it (mobile already gets this via the shared mobile rule). */
-  .stage.subpage .masthead {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-  }
-}
-
-/* Mobile portrait: zoom the background in a touch */
-@media (max-width: 859px) and (orientation: portrait) {
-  body {
-    background-size: auto, auto 112%, auto;
-  }
-}
-
+/* Film grain over everything, static outside the cinema. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  opacity: var(--noise-opacity);
-  mix-blend-mode: multiply;
-  z-index: 1;
-}
-.stage {
-  position: relative;
-  z-index: 3;
-  min-height: 100vh;
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 6px 24px 24px;
+  z-index: 60;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.05;
+  mix-blend-mode: overlay;
 }
 
-.masthead {
-  text-align: center;
-  margin-bottom: 0;
+a {
+  color: inherit;
 }
-.masthead .logo {
-  display: block;
-  width: clamp(440px, 64vw, 860px);
-  height: auto;
-  margin: 0 auto;
+:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
 }
-/* Logo position nudge. Relative offsets (not a transform) so they don't clash
-   with the `.logo` transforms on mobile. */
-.masthead .logo {
-  position: relative;
-}
-/* Up on desktop — home only: the subpage masthead is sticky at the very top of
-   the viewport, where nudging the logo up would clip it. */
-@media (min-width: 861px) {
-  .stage:not(.subpage) .masthead .logo { top: -15px; }
-}
-/* Right on mobile — applied to the home and subpage mastheads alike so the
-   subpage back-home logo lines up exactly with the main page. */
-@media (max-width: 860px) {
-  .masthead .logo { left: 15px; }
-}
-
-/* ---- Sub-pages (Our Story / Upcoming Gigs) ---- */
-/* Soft dark shadow behind the sticky logo, fading in only once it's pinned
-   and content is scrolling behind it. (.masthead is already position:sticky
-   for subpages at every width — see the mobile-shared rule and the
-   min-width:860px rule above — so it's already a positioning context.) */
-.stage.subpage .masthead::before {
-  content: '';
+.sr-only {
   position: absolute;
-  top: -12px;
-  bottom: -12px;
-  left: calc(50% - 50vw);
-  right: calc(50% - 50vw);
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 0, 0, 0.96) 0%,
-    rgba(0, 0, 0, 0.85) 40%,
-    rgba(0, 0, 0, 0.55) 65%,
-    transparent 88%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: -1;
-  pointer-events: none;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
-.stage.subpage .masthead.stuck::before {
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- Top letterbox bar (every page) ---- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: calc(var(--bar-h) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) var(--gutter-r) 0 var(--gutter-l);
+  background: #000;
+  border-bottom: 1px solid #16130f;
+}
+.topbar .logo {
+  display: block;
+  height: 22px;
+  width: auto;
+}
+.now-showing {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.now-showing .title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--bone);
+}
+.now-showing .title.mule {
+  color: var(--ochre);
+}
+.topbar .rpm {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.bar-btn {
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--bone);
+  font-size: 11px;
+  letter-spacing: -0.05em;
+  cursor: pointer;
+  transition: border-color 0.2s ease, scale var(--press-ms) var(--ease-out);
+}
+.bar-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+@media (hover: hover) and (pointer: fine) {
+  .bar-btn:hover:not(:disabled) {
+    border-color: var(--red);
+  }
+}
+@media (max-width: 640px) {
+  .topbar .logo {
+    height: 17px;
+  }
+  .now-showing .label,
+  .topbar .rpm {
+    display: none;
+  }
+}
+
+/* ---- The cinema (home) ---- */
+.cinema {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: calc(100vh - var(--bar-h));
+  min-height: calc(100svh - var(--bar-h) - env(safe-area-inset-top, 0px));
+  background: #000;
+  transition: --tint 1.4s ease;
+}
+.screen {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 3vh, 40px) var(--gutter-r) clamp(16px, 3vh, 40px) var(--gutter-l);
+  background: var(--room);
+}
+.backdrop {
+  position: absolute;
+  inset: -12%;
+  background: center / cover no-repeat;
+  filter: blur(40px) brightness(0.36) saturate(1.25);
+  opacity: 0;
+  transition: opacity 1.6s ease;
+  animation: drift 26s ease-in-out infinite alternate;
+}
+.backdrop.on {
   opacity: 1;
 }
+@starting-style {
+  .backdrop.on {
+    opacity: 0;
+  }
+}
+.is-mule .backdrop {
+  filter: blur(34px) brightness(0.42) sepia(0.45) saturate(1.3);
+}
+@keyframes drift {
+  from {
+    transform: scale(1.08) translate(-2%, -1%);
+  }
+  to {
+    transform: scale(1.22) translate(2%, 1.5%);
+  }
+}
+.spot {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 42% 60% at 50% 47%, color-mix(in oklab, var(--tint) 24%, transparent), transparent 72%);
+}
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 75% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.85));
+}
+.grain {
+  position: absolute;
+  inset: -50%;
+  z-index: 2;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  animation: grain 1s steps(5) infinite;
+}
+@keyframes grain {
+  20% { transform: translate(-6%, 4%); }
+  40% { transform: translate(5%, -7%); }
+  60% { transform: translate(-3%, 8%); }
+  80% { transform: translate(7%, 2%); }
+}
+.deck-wrap {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 860px, max(300px, calc((100svh - var(--bar-h) - var(--bottom-h) - 64px) * 1.282)));
+}
 
-.subpage-content {
-  max-width: 720px;
-  margin: 6vh auto 0;
+/* Opening credit, once per tab (see the inline script in Base.astro). */
+.intro {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 16px;
+  padding: 0 24px;
   text-align: center;
-  font-family: 'Abel', sans-serif;
-  color: var(--ink);
+  background: #000;
+  pointer-events: none;
+  animation: intro 2.8s ease both;
+}
+.intro img {
+  width: min(560px, 82vw);
+  height: auto;
+}
+.intro span {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.no-intro .intro {
+  display: none;
+}
+@keyframes intro {
+  0%, 55% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+/* Title card when a record is picked. */
+.title-card {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  padding: 0 20px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.62);
+  pointer-events: none;
+  animation: card 2.6s ease forwards;
+}
+.title-card .k,
+.title-card .s {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.title-card .h {
+  font-family: var(--display);
+  font-weight: 300;
+  font-size: clamp(48px, 9vw, 120px);
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.is-mule .title-card .h {
+  font-family: var(--mule);
+  color: var(--ochre);
+  letter-spacing: 0.32em;
+}
+@keyframes card {
+  0% { opacity: 0; }
+  15%, 70% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+/* ---- The deck ---- */
+.deck {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1200 / 936;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.9), 0 8px 24px rgba(0, 0, 0, 0.5);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.deck-img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.platter,
+.mat {
+  position: absolute;
+  top: 49.4%;
+  left: 39.8%;
+  width: 68%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+/* Felt mat under a 7-inch, hiding the photo's printed LP. */
+.mat {
+  background: radial-gradient(circle, #1d1b19 0 40%, #141211 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.deck.is-single .mat {
+  opacity: 1;
+}
+.spin {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.disc {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 3px),
+    var(--vinyl, #0b0b0b);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  animation: lower 0.8s var(--spring-smooth) both;
+}
+.disc::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 210deg, transparent 0 30deg, rgba(255, 255, 255, 0.13) 55deg, transparent 85deg 205deg, rgba(255, 255, 255, 0.08) 235deg, transparent 265deg);
+}
+@keyframes lower {
+  from {
+    transform: scale(1.14);
+    opacity: 0;
+  }
+}
+.disc-single {
+  width: 58.3%;
+  height: 58.3%;
+}
+.disc-label {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 32%;
+  height: 32%;
+  border-radius: 50%;
+  background: center / cover no-repeat;
+  box-shadow: 0 0 0 2px #000, inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+/* Album III's sticker is framed tighter: zoom it out on a white label. */
+.disc-label.alt-label {
+  background-size: 82%;
+  background-color: #f5f0e6;
+}
+.disc-label::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 5%;
+  height: 5%;
+  border-radius: 50%;
+  background: #000;
+}
+/* 7-inch: bigger label, wide centre hole with a yellow spindle adapter. */
+.disc-single .disc-label {
+  width: 48%;
+  height: 48%;
+}
+.disc-single .disc-label::after {
+  width: 44%;
+  height: 44%;
+  background: radial-gradient(circle, #111 0 16%, #e2b440 17% 58%, #9c7a22 60% 64%, #0b0b0b 66%);
+}
+.tonearm {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.tonearm-arm {
+  transform-box: view-box;
+  transform-origin: 1002px 227px;
+  transition: transform 1.1s cubic-bezier(0.45, 0, 0.3, 1);
+}
+.tonearm-arm.follow {
+  transition: transform 0.6s linear;
+}
+/* Buttons laid over the ones printed in the photo. */
+.deck-btn {
+  position: absolute;
+  z-index: 5;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, background-color var(--press-ms) var(--ease-out);
+}
+.deck-btn:active {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.deck-btn.on {
+  box-shadow: inset 0 0 0 2px rgba(224, 74, 58, 0.95), 0 0 16px rgba(224, 74, 58, 0.55);
+}
+.start-stop {
+  left: 2.3%;
+  top: 86.5%;
+  width: 9.9%;
+  height: 11.3%;
+}
+.speed {
+  top: 93.8%;
+  width: 5.3%;
+  height: 3%;
+}
+.speed-33 {
+  left: 86.1%;
+}
+.speed-45 {
+  left: 91.6%;
+}
+.spin-hint {
+  position: absolute;
+  left: 13.8%;
+  top: 88.5%;
+  z-index: 6;
+  padding: 6px 9px;
+  border-radius: 4px;
+  background: #000;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.spin-hint::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  border: 6px solid transparent;
+  border-left: 0;
+  border-right-color: #000;
+  transform: translateY(-50%);
+}
+.spin-hint.hidden {
+  opacity: 0;
+}
+
+/* ---- Bottom letterbox bar: transport and the film strip ---- */
+.bottombar {
+  position: relative;
+  z-index: 3;
+  background: #000;
+  padding: 12px 0 calc(10px + env(safe-area-inset-bottom, 0px));
+}
+.transport {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 0 var(--gutter-r) 10px var(--gutter-l);
+}
+.transport-btns {
+  display: flex;
+  gap: 6px;
+}
+.bar-play {
+  min-width: 48px;
+}
+.time {
+  min-width: 3.4em;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.scrub,
+.volume {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 24px;
+  background: transparent;
+  cursor: pointer;
+}
+.scrub {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+.volume {
+  width: 110px;
+}
+.scrub:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.scrub::-webkit-slider-runnable-track,
+.volume::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--red) var(--p, 0%), rgba(255, 255, 255, 0.14) var(--p, 0%));
+}
+.scrub::-moz-range-track,
+.volume::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--red) var(--p, 0%), rgba(255, 255, 255, 0.14) var(--p, 0%));
+}
+.scrub::-webkit-slider-thumb,
+.volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--bone);
+}
+.scrub::-moz-range-thumb,
+.volume::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bone);
+}
+.speed-toggle {
+  display: flex;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.speed-toggle button {
+  min-width: 46px;
+  min-height: 32px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  cursor: pointer;
+}
+.speed-toggle button.on {
+  background: var(--red);
+  color: #120806;
+}
+.speed-toggle button:disabled {
+  cursor: default;
+}
+/* Phones: buttons and speed on one row, the position bar on the next.
+   Volume is left to the hardware buttons (iOS ignores web volume anyway). */
+@media (max-width: 640px) {
+  .transport {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'btns . speed' 'cur scrub dur';
+  }
+  .transport-btns { grid-area: btns; }
+  .speed-toggle { grid-area: speed; }
+  .time-cur { grid-area: cur; }
+  .scrub { grid-area: scrub; }
+  .time-dur { grid-area: dur; text-align: right; }
+  .volume { display: none; }
+}
+.reel {
+  display: flex;
+  justify-content: safe center;
+  gap: 10px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  padding: 14px var(--gutter-r) 14px var(--gutter-l);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 9px, #26221f 9px 15px) top / 100% 5px no-repeat,
+    repeating-linear-gradient(90deg, transparent 0 9px, #26221f 9px 15px) bottom / 100% 5px no-repeat;
+}
+.reel::-webkit-scrollbar {
+  display: none;
+}
+.frame {
+  flex: 0 0 auto;
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+.frame img {
+  display: block;
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 2px;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  filter: grayscale(0.6) brightness(0.72);
+  transition: filter 0.4s ease, translate var(--spring-snappy-ms) var(--spring-snappy), outline-color 0.3s ease, scale var(--press-ms) var(--ease-out);
+}
+.frame span {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.frame.on img {
+  filter: none;
+  translate: 0 -3px;
+  outline-color: var(--red);
+}
+.frame:active img {
+  scale: var(--press-scale);
+}
+@media (hover: hover) and (pointer: fine) {
+  .frame:hover img {
+    filter: none;
+    translate: 0 -3px;
+  }
+}
+.frame-single img {
+  width: 64px;
+  height: 64px;
+  margin-top: 24px;
+  border-radius: 50%;
+}
+.frame-single span {
+  font-family: var(--mule);
+  letter-spacing: 0.1em;
+  color: var(--ochre);
+}
+.frame-single.on img {
+  outline-color: var(--ochre);
+}
+.intermission {
+  flex: 0 0 auto;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 0 10px 0 16px;
+  border-left: 1px dashed rgba(215, 140, 66, 0.45);
+  font-family: var(--mule);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ochre);
+}
+.intermission img {
+  width: 44px;
+  height: auto;
+  border-radius: 3px;
+}
+
+/* ---- Lobby cards (home, below the cinema) ---- */
+.lobby {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px var(--gutter-r) 32px var(--gutter-l);
+  text-align: center;
+}
+.lobby-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 40px clamp(24px, 6vw, 72px);
+  margin-top: 32px;
+}
+.lobby-card {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  text-decoration: none;
+  transition: translate var(--spring-snappy-ms) var(--spring-snappy), scale var(--press-ms) var(--ease-out);
+}
+.lobby-card img {
+  display: block;
+  width: auto;
+  height: clamp(190px, 30vw, 330px);
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.95);
+}
+.lobby-king img {
+  rotate: -4deg;
+}
+.lobby-queen img {
+  rotate: 4deg;
+}
+.lobby-card:active {
+  scale: var(--press-scale);
+}
+@media (hover: hover) and (pointer: fine) {
+  .lobby-card:hover {
+    translate: 0 -8px;
+  }
+}
+.lobby-caption {
+  display: grid;
+  gap: 4px;
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.lobby-caption small {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+/* ---- Footer as end credits ---- */
+.credits {
+  padding: 72px var(--gutter-r) calc(48px + env(safe-area-inset-bottom, 0px)) var(--gutter-l);
+  border-top: 1px solid var(--rule);
+  text-align: center;
+}
+.credit-roll {
+  display: grid;
+  gap: 30px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.credit-roll dt {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.credit-roll dd {
+  margin-top: 8px;
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.credit-roll a,
+.legal-links a,
+.inquiries-link {
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-underline-offset: 4px;
+}
+.credit-mule dt {
+  font-family: var(--mule);
+  font-size: 12px;
+  color: var(--ochre);
+}
+.credit-mule dd {
+  font-family: var(--mule);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 0.16em;
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .credit-roll > div {
+      animation: credit linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+@keyframes credit {
+  from {
+    opacity: 0.15;
+    translate: 0 24px;
+  }
+}
+.social {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.social-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--bone);
+  transition: color 0.25s ease, scale var(--press-ms) var(--ease-out);
+}
+.social-btn svg,
+.social-btn .social-img {
+  display: block;
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+  object-fit: contain;
+}
+@media (hover: hover) and (pointer: fine) {
+  .social-btn:hover {
+    color: var(--red);
+  }
+}
+.legal-links {
+  margin-top: 40px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- Sub-pages: Ramblings, Upcoming Gigs, legal, 404 ---- */
+.subpage-content {
+  max-width: 68ch;
+  margin: 0 auto;
+  padding: clamp(40px, 8vh, 88px) var(--gutter-r) 80px var(--gutter-l);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 0 24px;
+  gap: 22px;
+  text-align: center;
 }
 .subpage-title {
-  font-family: 'Abel', sans-serif;
-  color: #cfd2d6;
-  letter-spacing: 0.3em;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(48px, 9vw, 96px);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
-  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  text-wrap: balance;
 }
 .subpage-content p {
-  font-size: clamp(1.15rem, 2vw, 1.3rem);
-  letter-spacing: 0.06em;
-  line-height: 1.8;
-  color: var(--ink-soft);
+  font-size: clamp(18px, 2vw, 20px);
+  line-height: 1.75;
+  color: var(--text);
 }
-.subpage-content .side-link {
-  writing-mode: horizontal-tb;
-  text-orientation: mixed;
-  padding: 12px 22px;
-}
-.subpage-signature {
+.subpage-content .subpage-signature {
   align-self: flex-end;
   font-style: italic;
-  letter-spacing: 0.12em;
-  color: var(--ink);
-  margin-top: 8px;
+  color: var(--bone);
 }
-/* Cross-links between subpages (Back / Our Story / Upcoming Gigs), shown
-   together at the bottom of Our Story and Upcoming Gigs. */
 .subpage-links {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
+  margin-top: 16px;
 }
-
-/* ---- Legal pages (Privacy / Terms): left-aligned, readable long-form text,
-   unlike the centered poetic copy the rest of .subpage-content is tuned for. ---- */
-.legal-content {
-  width: 100%;
-  text-align: left;
-}
-.legal-content h2 {
-  font-family: 'Abel', sans-serif;
-  color: var(--ink);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-size: 1.05rem;
-  margin: 26px 0 10px;
-}
-.legal-content h2:first-child {
-  margin-top: 0;
-}
-.legal-content p,
-.legal-content li {
-  font-size: 0.95rem;
-  letter-spacing: 0.02em;
-  line-height: 1.7;
-  color: var(--ink-soft);
-  margin-bottom: 14px;
-  text-align: left;
-}
-.legal-content ul {
-  padding-left: 20px;
-  margin-bottom: 14px;
-}
-.legal-content .legal-updated {
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  opacity: 0.75;
-}
-.legal-content .legal-notice {
-  border: 1px solid rgba(232, 192, 80, 0.4);
-  border-radius: 8px;
-  padding: 14px 16px;
-  font-size: 0.85rem;
-  color: var(--accent);
-}
-.gig-entry {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 24px 32px;
-  width: 100%;
-}
-.gig-name {
-  font-size: clamp(1.3rem, 3vw, 1.7rem) !important;
-  color: var(--ink) !important;
-  letter-spacing: 0.2em !important;
-  text-transform: uppercase;
-  margin: 0;
-}
-.gig-details {
-  font-size: clamp(1rem, 2vw, 1.2rem) !important;
-  color: var(--ink-soft) !important;
-  letter-spacing: 0.1em !important;
-  margin: 0;
-}
-.gig-map-link {
-  margin-top: 10px;
-  font-family: 'Abel', sans-serif;
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(207, 210, 214, 0.4);
-  transition: color 0.25s ease, border-color 0.25s ease;
-}
-@media (hover: hover) and (pointer: fine) {
-  .gig-map-link:hover {
-  color: var(--ink);
-  border-color: var(--ink);
-}
-}
-
-/* ---- Ramblings blog: vertical tabs (shown once there are 2+ posts) ---- */
-.story-blog {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 28px;
-  width: 100%;
-}
-.story-tabs {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  max-width: 420px;
-}
-.story-tab {
-  font-family: 'Abel', sans-serif;
+.side-link {
+  display: inline-grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
-  background: transparent;
-  border: 1px solid rgba(207, 210, 214, 0.3);
-  border-radius: 6px;
-  padding: 12px 18px;
-  cursor: pointer;
-  text-align: center;
-  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease, scale var(--press-ms) var(--ease-out);
+  text-decoration: none;
+  transition: border-color 0.2s ease, scale var(--press-ms) var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .story-tab:hover {
-  color: var(--ink);
-  border-color: rgba(240, 230, 192, 0.5);
+  .side-link:hover {
+    border-color: var(--red);
+  }
 }
+.gig-entry {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 24px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
 }
-.story-tab.active {
-  color: #02050f;
-  background: var(--accent);
-  border-color: var(--accent);
+.subpage-content .gig-name {
+  font-family: var(--display);
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--bone);
 }
+.subpage-content .gig-details {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.gig-map-link {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-underline-offset: 4px;
+}
+.story-blog,
 .story-panel {
   display: flex;
   flex-direction: column;
@@ -341,1181 +979,77 @@ body::before {
   gap: 24px;
   width: 100%;
 }
-
-/* ---- Side-by-side player scene ---- */
-.player-scene {
+.story-tabs {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 40px;
-  width: min(1420px, 96vw);
-  margin: auto;
-  transform: translateY(9vh);
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
 }
-
-.album-sidebar {
-  flex: 1;
-  min-width: 0;
-}
-.side-link {
-  flex-shrink: 0;
-  align-self: center;
-  writing-mode: vertical-rl;
-  text-orientation: upright;
-  font-family: 'Abel', sans-serif;
-  color: #cfd2d6;
-  letter-spacing: 0.18em;
-  font-size: 0.85rem;
+.story-tab {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  text-decoration: none;
-  text-align: center;
-  padding: 22px 12px;
-  border: 1px solid rgba(207, 210, 214, 0.4);
-  border-radius: 4px;
-  transition:
-    color 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    scale var(--press-ms) var(--ease-out);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, scale var(--press-ms) var(--ease-out);
 }
-@media (hover: hover) and (pointer: fine) {
-  .side-link:hover {
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.18);
+.story-tab.active {
+  border-color: var(--red);
+  color: var(--bone);
 }
-}
-.side-link-img {
-  display: none;
-}
-.side-link-img-mobile {
-  display: none;
-}
-/* Wraps the Upcoming Gigs link. On mobile this just holds the link (the
-   flanking picks are hidden); on desktop it stacks III / link / V. */
-.side-link-cluster {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-/* The cluster holds only the Upcoming Gigs link now — its flanking album picks
-   (III & V) live in the shelf / centre instead, so hide the cluster picks at
-   every width. */
-.cluster-pick {
-  display: none;
-}
-/* Album III has a desktop-only copy floated above the turntable (positioned in
-   the min-width:860 block). Hidden by default so it only shows on desktop. */
-.above-turntable {
-  display: none;
-}
-@media (min-width: 860px) {
-  .side-link-img {
-    display: block;
-    width: 90px;
-    height: auto;
-  }
-  .side-link-left .side-link-img {
-    width: 140px;
-  }
-  .side-link-text {
-    display: none;
-  }
-  .side-link {
-    writing-mode: horizontal-tb;
-    padding: 0;
-    border: none;
-    background: transparent;
-    transition: transform var(--spring-bouncy-ms) var(--spring-bouncy);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .side-link:hover {
-    box-shadow: none;
-    border-color: transparent;
-  }
-  }
-  .side-link-left {
-    transform: translateX(14px) rotate(-7deg);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .side-link-left:hover {
-    transform: translateX(14px) rotate(-7deg) translateY(-8px);
-  }
-  }
-  .side-link-cluster {
-    flex-shrink: 0;
-    gap: 20px;
-  }
-  /* .side-link-cluster has no definite width of its own (unlike the shelves,
-     which inherit width from .album-sidebar's flex:1), so the base
-     .vinyl-pick { width:100% } can't resolve and collapses small. Give the
-     cluster discs an explicit size instead so they match the others. */
-  .side-link-cluster .vinyl-pick {
-    width: 227px;
-    max-width: 227px;
-  }
-  .side-link-cluster .vinyl-pick.album-5 {
-    margin-top: 24px;
-    margin-left: -30px;
-    /* Base tilt is rotate(-3deg) (leaning left); on desktop lean it to the
-       right a bit instead. */
-    transform: rotate(19deg);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .side-link-cluster .vinyl-pick.album-5:hover {
-    transform: rotate(19deg) translateY(-8px);
-  }
-  }
-  /* Spin just the record to the left and slide it left within the case; the
-     sleeve keeps its rightward lean. translateX comes first so the shift is
-     horizontal in page space rather than along the rotated axis. */
-  .side-link-cluster .vinyl-pick.album-5 .vinyl-disc {
-    transform: translateX(-22px) rotate(-15deg);
-  }
-  .side-link-cluster .vinyl-pick.album-3 {
-    margin-top: -10px;
-    margin-left: -100px;
-  }
-  /* Right shelf stacks IV (top) and V (bottom) on desktop, mirroring I & II on
-     the left — hide III here; it's floated above the turntable instead. */
-  .shelf-triple .vinyl-pick.album-3 {
-    display: none;
-  }
-  /* Album III floated just above the turntable, centred on it. Anchored to
-     .turntable-wrap (position:relative) so it tracks the player exactly, at the
-     same 227px size as the shelf picks. The `.vinyl-pick.above-turntable`
-     selector (3 classes) is needed so this transform outranks the base
-     `.vinyl-pick.album-3 { transform: rotate(-2.5deg) }` rule further down the
-     file — otherwise that ties on specificity and wins on source order, wiping
-     out the translateX. */
-  .turntable-wrap .vinyl-pick.above-turntable {
-    display: block;
-    position: absolute;
-    left: 50%;
-    bottom: 100%;
-    width: 227px;
-    /* Centred on the turntable (-50%), nudged 10px right, and lifted 35px (25px
-       to cancel the player's extra drop + 10px more) for a gap above the player. */
-    transform: translate(calc(-50% + 10px), -35px) rotate(-2.5deg);
-    z-index: 5;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .turntable-wrap .vinyl-pick.above-turntable:hover {
-    transform: translate(calc(-50% + 10px), -43px) rotate(-2.5deg);
-  }
-  }
-  .side-link-right {
-    transform: rotate(5deg);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .side-link-right:hover {
-    transform: rotate(5deg) translateY(-8px);
-  }
-  }
-}
-
-.turntable-wrap {
-  position: relative;
-  width: min(365px, 40vw);
-  aspect-ratio: 1420 / 1108;
-  flex-shrink: 0;
-}
-
-.turntable {
-  position: absolute;
-  inset: 0;
-  border-radius: 6px;
-  /* Photographic turntable */
-  background-image: url('/covers/playeronlynew.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  box-shadow:
-    0 30px 60px -20px rgba(0, 0, 0, 0.85),
-    0 8px 24px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-}
-
-/* Spinning record overlay — aligned to the platter in the photo */
-.platter {
-  position: absolute;
-  top: 49.4%;
-  left: 39.8%;
-  transform: translate(-50%, -50%);
-  width: 68%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-}
-
-.record-spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+.legal-content {
   width: 100%;
-  aspect-ratio: 1/1;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+  text-align: left;
 }
-
-.record {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  transform: translate(-50%, -50%) scale(0);
-  border-radius: 50%;
-  background:
-    repeating-radial-gradient(
-      circle at center,
-      #000000 0px,
-      #000000 1px,
-      #0d0d0d 1px,
-      #0d0d0d 2px
-    ),
-    radial-gradient(circle at 35% 30%, #111111 0%, #000000 70%);
-  box-shadow:
-    inset 0 0 30px rgba(0, 0, 0, 0.8),
-    0 4px 20px rgba(0, 0, 0, 0.6);
-  pointer-events: none;
-}
-.record::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background:
-    radial-gradient(
-      ellipse at 30% 25%,
-      rgba(255, 255, 255, 0.14),
-      transparent 35%
-    ),
-    conic-gradient(
-      from 180deg,
-      transparent 0deg,
-      rgba(255, 255, 255, 0.07) 90deg,
-      transparent 180deg,
-      rgba(255, 255, 255, 0.04) 270deg,
-      transparent 360deg
-    );
-  pointer-events: none;
-}
-.record-label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 32%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 0 0 2px #000000;
-}
-/* Album III's sticker image is framed tighter than the others — zoom it
-   out a bit and fill the exposed edges with white, like a real label. */
-.record-label.alt-label {
-  background-size: 82%;
-  background-repeat: no-repeat;
-  background-color: #f5f0e6;
-}
-.record-label::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #000000;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.9);
-}
-
-.record.show {
-  transform: translate(-50%, -50%) scale(1);
-}
-.record.playing {
-  transform: translate(-50%, -50%) scale(1);
-  animation: spin 4s linear infinite;
-  animation-play-state: running;
-}
-.record.playing.paused {
-  animation-play-state: paused;
-}
-
-@keyframes spin {
-  from {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-
-/* Tonearm — arm.png overlay rotating about its bearing onto the record */
-.tonearm {
-  position: absolute;
-  left: 34.2%;
-  top: 11.4%;
-  width: 60%;
-  transform-origin: 82.2% 21.6%;
-  transform: rotate(18deg);
-  transition: transform 1.1s cubic-bezier(0.45, 0, 0.3, 1);
-  z-index: 8;
-  pointer-events: none;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
-}
-.tonearm img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.tonearm.playing {
-  transform: rotate(0deg);
-}
-
-/* START/STOP button — overlays the printed button at the deck's bottom-left */
-.start-stop-btn {
-  position: absolute;
-  left: 2.3%;
-  top: 86.5%;
-  width: 9.9%;
-  height: 11.3%;
-  padding: 0;
-  border: none;
-  background-color: transparent;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  background-position: center;
-  cursor: pointer;
-  z-index: 9;
-  transition: filter 0.15s ease, transform var(--press-ms) var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .start-stop-btn:hover {
-  filter: brightness(1.06);
-}
-}
-.start-stop-btn:active {
-  transform: translateY(1px) scale(0.985);
-  filter: brightness(0.94);
-}
-.start-stop-btn:disabled {
-  cursor: default;
-}
-
-/* Hand-drawn "press to spin" hint pointing at the start/stop button */
-.spin-hint {
-  position: absolute;
-  top: 68%;
-  left: 15%;
-  display: flex;
-  align-items: flex-start;
-  gap: 2px;
-  color: var(--ink);
-  pointer-events: none;
-  z-index: 10;
-  opacity: 0.92;
-  transition: opacity 0.6s ease;
-}
-.spin-hint.hidden {
-  opacity: 0;
-}
-.spin-hint-arrow {
-  width: clamp(52px, 21%, 82px);
-  height: auto;
-  flex-shrink: 0;
-  margin-top: 16px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
-}
-.spin-hint-text {
-  font-family: 'Abel', sans-serif;
-  font-size: clamp(0.62rem, 2.4vw, 0.8rem);
-  letter-spacing: 0.16em;
+.legal-content h2 {
+  margin: 30px 0 10px;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 700;
   text-transform: uppercase;
-  white-space: nowrap;
-  margin-top: 2px;
-  transform: translateX(-44px);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
 }
-
-.shelf-title {
-  font-family: 'Abel', sans-serif;
-  color: var(--ink-soft);
-  letter-spacing: 0.4em;
-  font-size: 0.75rem;
+.legal-content h2:first-child {
+  margin-top: 0;
+}
+.legal-content p,
+.legal-content li {
+  margin-bottom: 14px;
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: var(--text);
+  text-align: left;
+}
+.legal-content ul {
+  padding-left: 20px;
+  margin-bottom: 14px;
+}
+.subpage-content .legal-updated {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 22px;
-  transition: color 1.2s ease;
+  color: var(--muted);
 }
-.shelf {
-  display: flex;
-  flex-direction: column;
-  gap: 44px;
-  align-items: center;
-}
-
-/* ---- Vinyl pick: disc laying on sleeve ---- */
-.vinyl-pick {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  max-width: 227px;
-  border-radius: 4px;
-  cursor: pointer;
-  position: relative;
-  background: transparent;
-  border: none;
-  padding: 0;
-  transition:
-    transform var(--spring-bouncy-ms) var(--spring-bouncy),
-    filter 0.4s ease,
-    scale var(--press-ms) var(--ease-out);
-  overflow: visible;
+.subpage-content .legal-notice {
+  padding: 14px 16px;
+  border: 1px solid rgba(224, 74, 58, 0.45);
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--bone);
 }
 
-/* Per-album base tilt */
-.vinyl-pick.album-1 { transform: rotate(-4deg); }
-.vinyl-pick.album-2 { transform: rotate(3deg); }
-.vinyl-pick.album-3 { transform: rotate(-2.5deg); }
-.vinyl-pick.album-4 { transform: rotate(3.5deg); }
-.vinyl-pick.album-5 { transform: rotate(-3deg); }
-
-/* Hover: preserve tilt, add lift */
-@media (hover: hover) and (pointer: fine) {
-  .vinyl-pick.album-1:hover { transform: rotate(-4deg) translateY(-8px); }
-}
-@media (hover: hover) and (pointer: fine) {
-  .vinyl-pick.album-2:hover { transform: rotate(3deg) translateY(-8px); }
-}
-@media (hover: hover) and (pointer: fine) {
-  .vinyl-pick.album-3:hover { transform: rotate(-2.5deg) translateY(-8px); }
-}
-@media (hover: hover) and (pointer: fine) {
-  .vinyl-pick.album-4:hover { transform: rotate(3.5deg) translateY(-8px); }
-}
-@media (hover: hover) and (pointer: fine) {
-  .vinyl-pick.album-5:hover { transform: rotate(-3deg) translateY(-8px); }
-}
-
-.vinyl-pick.selected {
-  filter: grayscale(0.5) brightness(0.6);
-}
-.vinyl-pick.selected .vinyl-disc {
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-.vinyl-pick .vinyl-disc {
-  transition: opacity 0.25s ease;
-}
-.vinyl-pick.active {
-  filter: none;
-  transform: translateY(-4px);
-}
-
-/* --- Sleeve / case --- */
-.vinyl-pick .sleeve {
-  position: absolute;
-  inset: 0;
-  border-radius: 4px;
-  background-size: cover;
-  background-position: center;
-  overflow: hidden;
-  z-index: 1;
-  box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.65),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-}
-
-/* Plastic wrap diagonal sheen */
-.vinyl-pick .sleeve::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.28) 0%,
-      rgba(255, 255, 255, 0.06) 18%,
-      transparent 38%,
-      transparent 62%,
-      rgba(255, 255, 255, 0.04) 80%,
-      transparent 100%
-    );
-  pointer-events: none;
-  border-radius: 4px;
-}
-
-/* Sticker shared base */
-.vinyl-pick .sleeve::after {
-  position: absolute;
-  font-family: 'Abel', sans-serif;
-  font-size: 0.42rem;
-  letter-spacing: 0.14em;
-  padding: 2px 6px 3px;
-  border-radius: 3px;
-  z-index: 5;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
-  text-transform: uppercase;
-  color: rgba(255, 248, 224, 0.95);
-}
-.vinyl-pick.album-1 .sleeve::after {
-  content: 'TRF';
-  bottom: 9px;
-  right: 7px;
-  background: #b86c30;
-  transform: rotate(-2deg);
-}
-.vinyl-pick.album-2 .sleeve::after {
-  content: '$ 7.50';
-  background: #c83870;
-  top: 9px;
-  right: 7px;
-  transform: rotate(1.5deg);
-}
-.vinyl-pick.album-3 .sleeve::after {
-  content: 'NM';
-  background: #3468b8;
-  bottom: 9px;
-  left: 7px;
-  transform: rotate(2.5deg);
-}
-.vinyl-pick.album-4 .sleeve::after {
-  content: '★ LP ★';
-  background: #527840;
-  top: 9px;
-  left: 7px;
-  transform: rotate(-1.5deg);
-}
-.vinyl-pick.album-5 .sleeve::after {
-  content: 'NEW';
-  background: #c9962e;
-  bottom: 9px;
-  right: 7px;
-  transform: rotate(-2deg);
-}
-
-/* --- Vinyl disc on top of sleeve --- */
-.vinyl-pick .vinyl-disc {
-  position: absolute;
-  top: 8%;
-  left: 8%;
-  width: 84%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  background:
-    repeating-radial-gradient(
-      circle at center,
-      #000000 0px,
-      #000000 1px,
-      #0d0d0d 1px,
-      #0d0d0d 2px
-    ),
-    #000000;
-  box-shadow:
-    5px 8px 22px rgba(0, 0, 0, 0.8),
-    inset 0 0 20px rgba(0, 0, 0, 0.6);
-  z-index: 3;
-}
-/* Per-album disc offsets — disc pushed to corner, cover center exposed. Each
-   record is also nudged slightly off the axis of its case's tilt so it doesn't
-   look glued to the sleeve (album 5's offset lives in the desktop cluster). */
-.vinyl-pick.album-1 .vinyl-disc { top: -34%; left: 32%;  width: 112%; transform: rotate(5deg); }
-.vinyl-pick.album-2 .vinyl-disc { top: 34%;  left: -30%; width: 109%; transform: rotate(-4deg); }
-.vinyl-pick.album-3 .vinyl-disc { top: -28%; left: -20%; width: 111%; transform: rotate(6deg); }
-.vinyl-pick.album-5 .vinyl-disc { top: 30%; left: -24%; width: 110%; }
-.vinyl-pick.album-4 .vinyl-disc { top: -38%; left: -30%; width: 108%; transform: rotate(-5deg); }
-.vinyl-pick .vinyl-disc::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background:
-    radial-gradient(
-      ellipse at 28% 22%,
-      rgba(255, 255, 255, 0.13),
-      transparent 30%
-    ),
-    radial-gradient(
-      ellipse at 75% 80%,
-      rgba(200, 200, 220, 0.07),
-      transparent 30%
-    );
-  pointer-events: none;
-}
-.vinyl-pick .vinyl-disc::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='r'><feTurbulence baseFrequency='0.7' numOctaves='3'/><feColorMatrix values='0 0 0 0 0.7  0 0 0 0 0.7  0 0 0 0 0.75  0 0 0 0.12 0'/></filter><rect width='100%' height='100%' filter='url(%23r)'/></svg>");
-  mix-blend-mode: screen;
-  opacity: 0.35;
-  pointer-events: none;
-}
-.vinyl-pick .label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 38%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 0 0 2px #000000;
-}
-/* Album III's sticker image is framed tighter than the others — zoom it
-   out a bit and fill the exposed edges with white, like a real label. */
-.vinyl-pick.album-3 .label {
-  background-size: 82%;
-  background-repeat: no-repeat;
-  background-color: #f5f0e6;
-}
-.vinyl-pick .label::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #000000;
-}
-.vinyl-pick .album-name {
-  position: absolute;
-  bottom: -22px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Abel', sans-serif;
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  color: var(--ink);
-  white-space: nowrap;
-  transition: color 1.2s ease;
-}
-
-.now-playing {
-  width: min(700px, 95vw);
-  margin: 30px auto 0;
-  background: transparent;
-  border: none;
-  padding: 18px;
-  opacity: 0;
-  transition: opacity 0.8s ease;
-  pointer-events: none;
-}
-.now-playing.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-.now-playing-label {
-  font-family: 'Abel', sans-serif;
-  color: var(--ink);
-  letter-spacing: 0.3em;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  text-align: center;
-  transition: color 1.2s ease;
-  filter: brightness(1.5);
-}
-.now-playing audio {
-  display: none;
-}
-.mini-player {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-.mini-play {
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: transparent;
-  color: #cfd2d6;
-  font-size: 0.8rem;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform var(--press-ms) var(--ease-out);
-}
-.mini-play:active:not(:disabled) {
-  transform: scale(0.9);
-}
-.mini-skip {
-  height: 40px;
-  border: none;
-  background: transparent;
-  color: #cfd2d6;
-  font-size: 0.62rem;
-  letter-spacing: -1px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform var(--press-ms) var(--ease-out);
-}
-.mini-skip:active:not(:disabled) {
-  transform: scale(0.9);
-}
-.mini-skip:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-.mini-play:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-.mini-volume {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 120px;
-  height: 28px;
-  background: transparent;
-  cursor: pointer;
-  touch-action: pan-y;
-}
-.mini-volume::-webkit-slider-runnable-track {
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(207, 210, 214, 0.3);
-}
-.mini-volume::-moz-range-track {
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(207, 210, 214, 0.3);
-}
-.mini-volume::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  margin-top: -10px;
-  border-radius: 50%;
-  background: #cfd2d6;
-  transition: transform var(--press-ms) var(--ease-out);
-}
-.mini-volume::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  border: none;
-  border-radius: 50%;
-  background: #cfd2d6;
-  transition: transform var(--press-ms) var(--ease-out);
-}
-.mini-volume:active::-webkit-slider-thumb { transform: scale(1.15); }
-.mini-volume:active::-moz-range-thumb { transform: scale(1.15); }
-
-footer {
-  margin-top: 60px;
-  text-align: center;
-}
-.inquiries {
-  font-family: 'Abel', sans-serif;
-  color: #cfd2d6;
-  letter-spacing: 0.3em;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 16px;
-}
-.inquiries-link {
-  display: inline;
-  margin-left: 4px;
-  color: #cfd2d6;
-  text-decoration: underline;
-  border: none;
-  font-weight: bold;
-  transition:
-    color 0.25s ease;
-}
-@media (hover: hover) and (pointer: fine) {
-  .inquiries-link:hover {
-  color: #ffffff;
-}
-}
-.social {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 18px;
-}
-.legal-links {
-  margin-top: 14px;
-  font-family: 'Abel', sans-serif;
-  color: #cfd2d6;
-  letter-spacing: 0.15em;
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  text-align: center;
-}
-.copyright {
-  margin-top: 18px;
-  font-family: 'Abel', sans-serif;
-  color: #cfd2d6;
-  letter-spacing: 0.2em;
-  font-size: 0.58rem;
-  line-height: 1.8;
-  text-transform: uppercase;
-  text-align: center;
-}
-.copyright > span {
-  display: block;
-}
-@media (min-width: 860px) {
-  .copyright {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 24px;
-    width: min(900px, 92vw);
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .copyright > span {
-    display: inline;
-  }
-  .copyright-left {
-    order: 1;
-    text-align: left;
-  }
-  .copyright-center {
-    order: 2;
-    text-align: center;
-  }
-  .copyright-right {
-    order: 3;
-    text-align: right;
-  }
-}
-.social-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  color: #cfd2d6;
-  border: none;
-  background: transparent;
-  transition:
-    color 0.25s ease,
-    filter 0.25s ease,
-    scale var(--press-ms) var(--ease-out);
-}
-.social-btn svg {
-  width: 36px;
-  height: 36px;
-  fill: currentColor;
-  display: block;
-}
-.social-btn .social-img {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-  display: block;
-}
-@media (hover: hover) and (pointer: fine) {
-  .social-btn:hover {
-  color: #ffffff;
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
-}
-}
-
-
-.flying-record {
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 100;
-  transition:
-    top 0.9s cubic-bezier(0.6, 0, 0.4, 1),
-    left 0.9s cubic-bezier(0.6, 0, 0.4, 1),
-    width 0.9s cubic-bezier(0.6, 0, 0.4, 1),
-    height 0.9s cubic-bezier(0.6, 0, 0.4, 1),
-    transform 0.9s cubic-bezier(0.6, 0, 0.4, 1);
-  background:
-    repeating-radial-gradient(
-      circle at center,
-      #000000 0px,
-      #000000 1px,
-      #0d0d0d 1px,
-      #0d0d0d 2px
-    ),
-    #000000;
-  box-shadow:
-    inset 0 0 30px rgba(0, 0, 0, 0.8),
-    0 10px 30px rgba(0, 0, 0, 0.6);
-}
-.flying-record .flying-label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 38%;
-  aspect-ratio: 1/1;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-}
-
-/* Below 860px: stack vertically, shelves become rows */
-@media (max-width: 860px) {
-  .masthead {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-  }
-  /* Full-bleed black backdrop that fades in only once the logo is pinned */
-  .masthead::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: calc(50% - 50vw);
-    width: 100vw;
-    height: calc(100% + 16px);
-    background:
-      url('/covers/finalfinalmob.webp') 15% center / cover no-repeat fixed,
-      radial-gradient(
-        ellipse at 50% 110%,
-        var(--bg-3) 0%,
-        var(--bg-2) 35%,
-        var(--bg-1) 80%
-      ) fixed;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: -1;
-    pointer-events: none;
-  }
-  .masthead.stuck::before {
-    opacity: 1;
-  }
-  .masthead .logo {
-    width: min(560px, 96vw);
-    transform: translateX(-4%);
-    transition: transform 0.3s ease;
-  }
-  .masthead.stuck .logo {
-    transform: translateX(-4%) translateY(8px);
-  }
-  /* Move the sections above the player down a bit (home only) */
-  .stage:not(.subpage) .masthead {
-    margin-top: 24px;
-  }
-  .side-link {
-    writing-mode: horizontal-tb;
-    text-orientation: mixed;
-    padding: 0;
-    border: none;
-    margin: 18px 0;
-  }
-  .side-link-left,
-  .side-link-right {
-    transform: translateX(-8px);
-  }
-  .side-link-img-mobile {
-    display: block;
-    width: min(140px, 38vw);
-    height: auto;
-  }
-  .side-link-text {
-    display: none;
-  }
-  .player-scene {
-    flex-direction: column;
-    align-items: center;
-    gap: 56px;
-    transform: none;
-  }
-  /* Swap the two nav buttons on mobile: Upcoming Gigs (in the cluster) moves to
-     the top and Ramblings to the bottom — the reverse of their DOM order — while
-     the albums and turntable stay in the middle. */
-  .player-scene .side-link-cluster {
-    order: -1;
-  }
-  .player-scene .side-link-left {
-    order: 1;
-  }
-  .turntable-wrap {
-    width: min(345px, 65vw);
-    transform: translate(-12px, 24px);
-    /* Pull the player back up so only the sections above it move down */
-    margin-top: -24px;
-  }
-  .album-sidebar {
-    width: min(560px, 92vw);
-  }
-  .shelf {
-    flex-direction: row;
-    justify-content: center;
-    gap: clamp(24px, 5vw, 50px);
-  }
-  .inquiries {
-    white-space: nowrap;
-    font-size: clamp(0.6rem, 2.4vw, 0.7rem);
-    letter-spacing: 0.05em;
-  }
-  .vinyl-pick {
-    max-width: 160px;
-  }
-  .vinyl-pick.album-2 {
-    top: -16px;
-  }
-  .vinyl-pick.album-2 .vinyl-disc {
-    top: 24%;
-  }
-  .vinyl-pick.album-3 {
-    top: 22px;
-  }
-  /* Mobile-only disc repositioning (desktop keeps its own tuned offsets) */
-  .vinyl-pick.album-1 .vinyl-disc {
-    left: -32%;
-  }
-  .vinyl-pick.album-4 .vinyl-disc {
-    top: -15%;
-    left: -14%;
-  }
-  /* Right shelf now holds 3 discs — keep them on one row, same size as
-     the top shelf's discs, overlap and all. flex-shrink:0 stops the browser
-     from shrinking them to fit; they overlap instead. */
-  .shelf.shelf-triple {
-    flex-wrap: nowrap;
-  }
-  /* IV overlaps III where they're squeezed together — keep III on top. */
-  .shelf.shelf-triple .vinyl-pick.album-3 {
-    z-index: 2;
-  }
-  .shelf.shelf-triple .vinyl-pick.album-4 {
-    z-index: 1;
-  }
-  .shelf.shelf-triple .vinyl-pick {
-    flex-shrink: 0;
-  }
-  .shelf.shelf-triple .vinyl-pick.album-3 {
-    margin-right: -20px;
-  }
-  .shelf.shelf-triple .vinyl-pick.album-5 {
-    margin-left: -20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .masthead .logo {
-    width: 92vw;
-    transform: translateX(-4%);
-  }
-  .vinyl-pick {
-    max-width: 128px;
-  }
-  .vinyl-pick .album-name {
-    font-size: 0.7rem;
-  }
-  .turntable-wrap {
-    width: 69vw;
-  }
-}
-
-/* ===== Desktop locked-layout tuning (placed last to win the cascade) ===== */
-@media (min-width: 860px) {
-  .player-scene {
-    transform: translateY(4vh);
-  }
-  .turntable-wrap {
-    /* 40px base + 30px + 25px lower. Transform-only, so nothing else shifts.
-       Album III is a child so it would ride down too — it lifts itself back up
-       by the same 25px (below) so a gap opens between it and the player. */
-    transform: translateY(95px);
-  }
-  .album-sidebar {
-    transform: translateY(24px);
-  }
-  .now-playing {
-    margin: 0 auto;
-    padding: 8px 18px;
-  }
-  .now-playing-label {
-    margin-bottom: 4px;
-  }
-  footer {
-    margin-top: 0;
-  }
-  .inquiries {
-    margin-bottom: 8px;
-  }
-  .social-btn {
-    width: 48px;
-    height: 48px;
-  }
-  .legal-links {
-    margin-top: 6px;
-  }
-  .copyright {
-    margin-top: 8px;
-  }
-}
-
-/* Short desktop screens: compress so the footer/copyright still fits */
-@media (min-width: 860px) and (max-height: 940px) {
-  .masthead .logo {
-    width: clamp(420px, 52vw, 720px);
-  }
-  .player-scene {
-    transform: none;
-    gap: 28px;
-  }
-  .turntable-wrap {
-    width: min(350px, 37vw);
-  }
-  .shelf {
-    gap: 24px;
-  }
-  .vinyl-pick {
-    max-width: 205px;
-  }
-  .now-playing {
-    margin-top: 0;
-    padding: 4px 18px;
-  }
-  .now-playing-label {
-    margin-bottom: 2px;
-  }
-  footer {
-    margin-top: 0;
-  }
-  .inquiries {
-    margin-bottom: 4px;
-  }
-  .social-btn {
-    width: 40px;
-    height: 40px;
-  }
-  .legal-links {
-    margin-top: 2px;
-  }
-  .copyright {
-    margin-top: 4px;
-  }
-}
-
-/* ---- Cookie / analytics consent banner ---- */
+/* ---- Cookie / analytics consent banner ----
+   Under the top bar: at the bottom it would cover the transport and film strip. */
 .cookie-banner {
   position: fixed;
   left: 50%;
-  bottom: 16px;
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
+  top: calc(var(--bar-h) + env(safe-area-inset-top, 0px) + 12px);
   z-index: 200;
   width: min(680px, 92vw);
   display: flex;
@@ -1523,66 +1057,66 @@ footer {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background: rgba(2, 5, 15, 0.95);
-  border: 1px solid rgba(207, 210, 214, 0.2);
-  border-radius: 10px;
   padding: 16px 20px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.94);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(6px);
+  transform: translateX(-50%);
 }
 .cookie-banner-text {
   flex: 1 1 320px;
-  font-family: 'Abel', sans-serif;
-  color: var(--ink-soft);
-  font-size: 0.85rem;
-  letter-spacing: 0.02em;
+  font-size: 15px;
   line-height: 1.5;
+  color: var(--text);
 }
 .cookie-banner-actions {
   display: flex;
-  gap: 10px;
   flex-shrink: 0;
+  gap: 10px;
 }
 .cookie-accept,
 .cookie-decline {
-  font-family: 'Abel', sans-serif;
-  letter-spacing: 0.1em;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-size: 0.78rem;
-  border-radius: 6px;
-  padding: 9px 16px;
   cursor: pointer;
-  transition: filter 0.2s ease, background 0.2s ease, color 0.2s ease, scale var(--press-ms) var(--ease-out);
+  transition: filter 0.2s ease, border-color 0.2s ease, scale var(--press-ms) var(--ease-out);
 }
 .cookie-accept {
-  border: none;
-  color: #02050f;
-  background: var(--accent);
+  border: 0;
+  background: var(--red);
+  color: #120806;
+}
+.cookie-decline {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: var(--bone);
 }
 @media (hover: hover) and (pointer: fine) {
   .cookie-accept:hover {
-  filter: brightness(1.08);
-}
-}
-.cookie-decline {
-  border: 1px solid rgba(207, 210, 214, 0.35);
-  background: transparent;
-  color: var(--ink-soft);
-}
-@media (hover: hover) and (pointer: fine) {
+    filter: brightness(1.08);
+  }
   .cookie-decline:hover {
-  color: var(--ink);
-  border-color: rgba(240, 230, 192, 0.5);
-}
+    border-color: var(--red);
+  }
 }
 @media (max-width: 480px) {
   .cookie-banner {
-    bottom: 0;
-    border-radius: 10px 10px 0 0;
-    padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+    padding: 14px 16px;
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .intro,
+  .title-card {
+    display: none;
+  }
+}
 
 /* Akos DS mobile feel: drop-in tokens + platform baseline. Generated springs from spring.js
    (node spring.js --css). Duration tokens are settle times; the motion reads as ~500ms. */
@@ -1624,10 +1158,10 @@ button, [role="button"], summary { -webkit-user-select: none; user-select: none;
 }
 
 /* ---- Touch-down press states (independent `scale` so tilted/translated elements keep their transform) ---- */
-.side-link:active, .story-tab:active, .vinyl-pick:active, .social-btn:active,
+.side-link:active, .story-tab:active, .bar-btn:active:not(:disabled), .social-btn:active,
 .cookie-accept:active, .cookie-decline:active { scale: var(--press-scale); }
-.gig-map-link:active, .inquiries-link:active { opacity: 0.7; }
-.side-link, .story-tab, .vinyl-pick, .social-btn, .cookie-accept, .cookie-decline {
+.gig-map-link:active, .credit-roll a:active, .legal-links a:active { opacity: 0.7; }
+.side-link, .story-tab, .bar-btn, .frame, .lobby-card, .social-btn, .cookie-accept, .cookie-decline {
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
 }
 
@@ -1638,5 +1172,5 @@ button, [role="button"], summary { -webkit-user-select: none; user-select: none;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .vinyl-pick:hover, .side-link:hover { translate: none; }
+  .lobby-card:hover, .frame:hover img { translate: none; }
 }

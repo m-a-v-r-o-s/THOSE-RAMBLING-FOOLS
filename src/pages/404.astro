@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import SubpageMasthead from '../components/SubpageMasthead';
+import TopBar from '../components/TopBar';
 ---
 
 <Base
@@ -10,7 +10,7 @@ import SubpageMasthead from '../components/SubpageMasthead';
   canonical={false}
 >
   <div class="stage subpage">
-    <SubpageMasthead client:load />
+    <TopBar client:load />
 
     <main class="subpage-content">
       <h1 class="subpage-title">Wrong Groove</h1>

@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import SubpageMasthead from '../components/SubpageMasthead';
+import TopBar from '../components/TopBar';
 import { getGigs } from '@/lib/gigs';
 import { formatWhen } from '@/lib/gig-format';
 
@@ -20,7 +20,7 @@ const gigs = await getGigs();
   }}
 >
   <div class="stage subpage">
-    <SubpageMasthead client:load />
+    <TopBar client:load />
 
     <main class="subpage-content">
       <h1 class="subpage-title">Upcoming Gigs</h1>

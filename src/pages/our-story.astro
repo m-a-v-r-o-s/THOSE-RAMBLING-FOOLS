@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import StoryView from '../components/StoryView';
-import SubpageMasthead from '../components/SubpageMasthead';
+import TopBar from '../components/TopBar';
 import { getPosts } from '@/lib/posts';
 
 // Always read the latest posts at request time.
@@ -20,7 +20,7 @@ const posts = await getPosts();
   }}
 >
   <div class="stage subpage">
-    <SubpageMasthead client:load />
+    <TopBar client:load />
 
     <main class="subpage-content">
       {/* A single post has no tabs, so it needs no JS at all. */}

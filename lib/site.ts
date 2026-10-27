@@ -9,4 +9,4 @@ export const SITE_URL = (
 export const SITE_NAME = 'Those Rambling Fools';
 
 export const SITE_DESCRIPTION =
-  'Original music from Those Rambling Fools, a band out of Kos, Greece. Play all five albums on the turntable, read the story behind them and find the next live gig.';
+  "Original music from Those Rambling Fools, a band out of Kos, Greece. Play all five albums and Christos P.'s Mule singles on the turntable, read the story behind them and find the next live gig.";
