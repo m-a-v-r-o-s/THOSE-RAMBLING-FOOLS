@@ -468,22 +468,32 @@ a {
 .deck-btn.on {
   box-shadow: inset 0 0 0 2px rgba(224, 74, 58, 0.95), 0 0 16px rgba(224, 74, 58, 0.55);
 }
+/* Measured on the photo's black frame: x 27-148, y 822-917 of 1200x936. */
 .start-stop {
-  left: 2.3%;
-  top: 86.5%;
-  width: 9.9%;
-  height: 11.3%;
+  left: 2.25%;
+  top: 87.82%;
+  width: 10.08%;
+  height: 10.15%;
+  border-radius: 5px;
 }
+/* The white 33 / 45 keys: x 1036-1093 and 1099-1156, y 881-896. */
 .speed {
-  top: 93.8%;
-  width: 5.3%;
-  height: 3%;
+  top: 94.12%;
+  width: 4.75%;
+  height: 1.6%;
+  border-radius: 1px;
+}
+/* The keys are tiny: extend the tap area without moving the outline. */
+.speed::after {
+  content: '';
+  position: absolute;
+  inset: -10px -2px;
 }
 .speed-33 {
-  left: 86.1%;
+  left: 86.33%;
 }
 .speed-45 {
-  left: 91.6%;
+  left: 91.58%;
 }
 .spin-hint {
   position: absolute;
