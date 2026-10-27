@@ -31,7 +31,7 @@ const pageUrl = `${SITE_URL}${Astro.url.pathname === '/' ? '' : Astro.url.pathna
 const ogUrl = og.title ? pageUrl : SITE_URL;
 const ogTitle = og.title ?? SITE_NAME;
 const ogDescription = og.description ?? SITE_DESCRIPTION;
-const ogImage = `${SITE_URL}${og.image ?? '/covers/finafinallbg.webp'}`;
+const ogImage = `${SITE_URL}${og.image ?? '/covers/og-home.jpg'}`;
 
 // Band entity schema. Members and origin come from data/story.json and the gig
 // listings, the profile links from the homepage footer, the discography from
@@ -42,7 +42,7 @@ const BAND_SCHEMA = {
   name: SITE_NAME,
   url: SITE_URL,
   description: SITE_DESCRIPTION,
-  image: `${SITE_URL}/covers/finafinallbg.webp`,
+  image: `${SITE_URL}/covers/og-home.jpg`,
   logo: `${SITE_URL}/covers/newlogo.webp`,
   genre: 'Rock',
   foundingLocation: { '@type': 'Place', name: 'Kos, Greece' },
@@ -118,6 +118,10 @@ const SCHEMA = { '@context': 'https://schema.org', '@graph': [BAND_SCHEMA, MULE_
     <meta property="og:url" content={ogUrl} />
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:image" content={ogImage} />
+    {/* Every share image is a 1200x630 JPEG (public/covers/og-*.jpg). */}
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogTitle} />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={ogTitle} />
