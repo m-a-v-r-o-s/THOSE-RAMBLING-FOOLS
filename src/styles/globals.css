@@ -13,10 +13,16 @@
   --body: 'Newsreader', Georgia, 'Times New Roman', serif;
   --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
   --mule: 'Josefin Sans', Futura, 'Century Gothic', sans-serif;
-  --bar-h: 56px;
+  --bar-h: 88px;
   --bottom-h: 178px;
   --gutter-l: max(16px, env(safe-area-inset-left, 0px));
   --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+
+@media (max-width: 640px) {
+  :root {
+    --bar-h: 64px;
+  }
 }
 
 /* Lets the room's colour fade from one sleeve to the next. */
@@ -77,14 +83,6 @@ a {
   clip-path: inset(50%);
   white-space: nowrap;
 }
-.eyebrow {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
 
 /* ---- Top letterbox bar (every page) ---- */
 .topbar {
@@ -99,9 +97,10 @@ a {
   background: #000;
   border-bottom: 1px solid #16130f;
 }
+/* The logo is the point of the bar: half its height. */
 .topbar .logo {
   display: block;
-  height: 22px;
+  height: calc(var(--bar-h) / 2);
   width: auto;
 }
 .now-showing {
@@ -160,12 +159,20 @@ a {
   }
 }
 @media (max-width: 640px) {
-  .topbar .logo {
-    height: 17px;
-  }
   .now-showing .label,
   .topbar .rpm {
     display: none;
+  }
+}
+/* Phones: the logo gets the bar. What's playing is already lit in the film
+   strip, and the pause button stays. The logo never pushes the button off a
+   narrow screen: 104px is the gutters, the gap and the button; 6.48 its ratio. */
+@media (max-width: 480px) {
+  .now-showing {
+    visibility: hidden;
+  }
+  .topbar .logo {
+    height: min(38px, calc((100vw - 104px) / 6.48));
   }
 }
 
@@ -763,7 +770,6 @@ a {
   justify-content: center;
   align-items: flex-end;
   gap: 40px clamp(24px, 6vw, 72px);
-  margin-top: 32px;
 }
 .lobby-card {
   display: grid;
