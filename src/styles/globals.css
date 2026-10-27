@@ -436,15 +436,17 @@ a {
   border-radius: 50%;
   background: #000;
 }
-/* 7-inch: bigger label, wide centre hole with a yellow spindle adapter. */
+/* 7-inch: bigger label, wide centre hole with a small chrome 45 adapter. */
 .disc-single .disc-label {
   width: 48%;
   height: 48%;
 }
 .disc-single .disc-label::after {
-  width: 44%;
-  height: 44%;
-  background: radial-gradient(circle, #111 0 16%, #e2b440 17% 58%, #9c7a22 60% 64%, #0b0b0b 66%);
+  width: 24%;
+  height: 24%;
+  background:
+    radial-gradient(circle closest-side, #111 0 44%, transparent 46% 90%, #1a1a1a 92% 100%),
+    conic-gradient(from 30deg, #f4f4f2, #9a9a96, #e9e9e6, #7d7d79, #f4f4f2, #a5a5a1, #f4f4f2);
 }
 .tonearm {
   position: absolute;
