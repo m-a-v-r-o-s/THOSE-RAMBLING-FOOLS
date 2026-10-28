@@ -13,7 +13,7 @@ export default function TopBar({ home = false }: { home?: boolean }) {
     <header className="topbar">
       {home ? logo : <a href="/" aria-label="Back to the turntable">{logo}</a>}
       <div className="now-showing" aria-live="polite">
-        <span className="label">{current ? 'Now showing' : 'Original music from Kos, Greece'}</span>
+        <span className="label">{current ? 'Now spinning' : 'Original music from Kos, Greece'}</span>
         {current && (
           <span className={`title${current.single ? ' mule' : ''}`}>
             {current.single ? `Mule · ${current.title}` : current.key === 'album-1' ? 'I · Those Rambling Fools' : current.title}
